@@ -1,0 +1,43 @@
+{
+  "name": "super-awesome-webpack-plugin",
+  "title": "Super Awesome Webpack Plugin",
+  "version": "0.1.4",
+  "description": "An opinionated Webpack plugin for generating static websites using React and Redux.",
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/steven-haddix/super-awesome-webpack-plugin.git"
+  },
+  "keywords": [
+    "Static Website Generaton",
+    "Webpack",
+    "React",
+    "Redux"
+  ],
+  "author": "Steven Haddix",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/steven-haddix/super-awesome-webpack-plugin/issues"
+  },
+  "homepage": "https://github.com/steven-haddix/super-awesome-webpack-plugin#readme",
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-core": "^6.18.2",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0",
+    "babel-register": "^6.18.0",
+    "cross-env": "^3.1.3",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
+    "react-redux": "^4.4.5",
+    "redux": "^3.6.0",
+    "webpack": "^1.13.3"
+  }
+}
