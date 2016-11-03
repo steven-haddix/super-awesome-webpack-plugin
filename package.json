@@ -1,7 +1,7 @@
 {
   "name": "super-awesome-webpack-plugin",
   "title": "Super Awesome Webpack Plugin",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "An opinionated Webpack plugin for generating static websites using React and Redux.",
   "main": "lib/index.js",
   "files": [
@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tape -r babel-register tests/**/*.js"
   },
   "repository": {
     "type": "git",
@@ -38,6 +38,7 @@
     "react-dom": "^15.3.2",
     "react-redux": "^4.4.5",
     "redux": "^3.6.0",
+    "tape": "^4.6.2",
     "webpack": "^1.13.3"
   }
 }

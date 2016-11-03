@@ -12,14 +12,14 @@ import {
     copyObjectProperty,
     providerWrapper,
     singlePageBuilder,
-    multiPageBuilder
+    multiPageBuilder,
+    es6Accessor
 } from './helpers'
 
 const superAwesomeWebpackPlugin = function(config) {
     this.config = config;
 };
 
-// TODO: fix the way the plugin handles ES6 modules
 superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
     var self = this;
 
@@ -36,8 +36,7 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                     }
 
                     const config = self.config[page];
-                    const component = config.component.default;
-                    const rootReducer = combineReducers(config.reducers)
+                    const rootReducer = combineReducers(es6Accessor(config.reducers))
                     const outputPages = config.pages;
                     const assetName = findAssetName(page, compilation, webpackStatsJson);
 
@@ -45,6 +44,7 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                         const outPage = outputPage.page;
                         const state = outputPage.state;
                         const route = outputPage.route;
+                        const component = es6Accessor(config.component);
 
                         // TODO: Add function to cleanup unused assets
                         copyObjectProperty(compilation.assets, assetName, `${route}/${assetName}`)
@@ -71,7 +71,7 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                     })
                 })
 
-                done(); // ;-)
+                done(); // ;)
             } catch (err) {
                 compilation.errors.push(err.stack);
                 done();

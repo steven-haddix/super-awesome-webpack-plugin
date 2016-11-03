@@ -3,7 +3,7 @@ import path from 'path';
 import React from 'react'
 import { Provider } from 'react-redux'
 
-export function singlePageBuilder(dir, route) {
+export function singlePageBuilder(dir, route, component) {
     let page = {};
     fs.readdirSync(dir).forEach((file) => {
         if(!/.*\.json/.test(file)) {
@@ -13,7 +13,8 @@ export function singlePageBuilder(dir, route) {
         page = {
             page: file.replace('.json', ''),
             state: require(path.resolve(dir, file)),
-            route: route
+            route: route,
+            component
         }
     })
 
@@ -32,7 +33,8 @@ export function multiPageBuilder(pages) {
             stateArray.push({
                 page: file.replace('.json', ''),
                 state: require(path.resolve(page.dir, file)),
-                route: page.route
+                route: page.route,
+                component: page.component
             })
         })
     })
@@ -105,14 +107,29 @@ export function getAssetsFromCompilation(compilation, webpackStatsJson) {
     return assets;
 }
 
-export function es6Execute(object) {
-    if(typeof object === 'object') {
-        return false;
+export function es6Accessor(object) {
+    if(Array.isArray(object)) {
+        return object.map(object => {
+            if(hasDefault(object)) {
+                return object['default'];
+            }
+
+            return object;
+        })
     }
 
-    if (object.hasOwnProperty('default')) {
-        return object['default']();
-    } else {
-        return object()
+    if(hasDefault(object)) {
+        return object['default']
     }
+
+    return object;
 }
+
+function hasDefault(object) {
+    if (typeof object === 'object' && object.hasOwnProperty('default')) {
+        return true;
+    }
+
+    return false;
+}
+
