@@ -59,6 +59,7 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                         const index = template(
                             renderedPage,
                             `${route}/${assetName}`,
+                            state,
                             assets.manifest,
                             assets.vendor,
                             style
