@@ -31,23 +31,21 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
             try {
                 const assets = getAssetsFromCompilation(compilation, webpackStatsJson);
                 Object.keys(self.config).map(page => {
-                    if(!self.config.hasOwnProperty(page)) {
-                        return false;
-                    }
-
                     const config = self.config[page];
                     const rootReducer = combineReducers(es6Accessor(config.reducers))
                     const outputPages = config.pages;
                     const assetName = findAssetName(page, compilation, webpackStatsJson);
 
+                    const appRoutes = [];
                     outputPages.map((outputPage) => {
                         const outPage = outputPage.page;
                         const state = outputPage.state;
                         const route = outputPage.route;
-                        const component = es6Accessor(config.component);
+                        const component = es6Accessor(outputPage.component);
 
-                        // TODO: Add function to cleanup unused assets
-                        copyObjectProperty(compilation.assets, assetName, `${route}/${assetName}`)
+                        copyObjectProperty(compilation.assets, assetName, `${route}/${assetName}`);
+                        copyObjectProperty(compilation.assets, `${assetName}.map`, `${route}/${assetName}.map`);
+                        appRoutes.push(`${route}/${assetName}`);
 
                         // TODO: Add middleware functionality
                         const store = createStore(rootReducer, state);
@@ -64,12 +62,18 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                             assets.manifest,
                             assets.vendor,
                             style
-                        )
+                        );
 
                         const outputFileName = path.join(route, outPage, 'index.html');
                         compilation.assets[outputFileName] = new RawSource(index);
-                    })
-                })
+                    });
+
+                    // Clean up unused assets that have been copied to other routes
+                    if(!appRoutes.includes(assetName)) {
+                        delete compilation.assets[assetName];
+                        delete compilation.assets[`${assetName}.map`];
+                    }
+                });
 
                 done(); // ;)
             } catch (err) {

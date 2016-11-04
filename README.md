@@ -110,11 +110,12 @@ Function for generating a single page for each JSON file in a directory. The JSO
 
 ## TODO
 ### Core
-- Handle ES6 modules seamlessly
+- ~~Handle ES6 modules more seamlessly~~
+- Add ability to define asset to template mapping.
 - Integrate with react-router for configuration mapping
 - Test/add webpack-dev-server support
 
 ### Page Builders
 - Base paths for data directories
 - Support localization in builder functions to reduce configuration noise
-
+- Validation around configuration
