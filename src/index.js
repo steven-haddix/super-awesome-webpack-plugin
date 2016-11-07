@@ -107,6 +107,7 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
     });
 };
 
-export {
-    superAwesomeWebpackPlugin
-}
+export default superAwesomeWebpackPlugin
+/**
+ *
+ */
