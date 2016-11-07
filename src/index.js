@@ -108,6 +108,3 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
 };
 
 export default superAwesomeWebpackPlugin
-/**
- *
- */
