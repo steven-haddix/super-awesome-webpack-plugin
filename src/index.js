@@ -11,8 +11,7 @@ import {
     findAssetName,
     copyObjectProperty,
     providerWrapper,
-    singlePageBuilder,
-    multiPageBuilder,
+    generatePageConfigs,
     es6Accessor
 } from './helpers'
 
@@ -30,43 +29,66 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
 
             try {
                 const assets = getAssetsFromCompilation(compilation, webpackStatsJson);
-                Object.keys(self.config).map(page => {
-                    const config = self.config[page];
-                    const rootReducer = combineReducers(es6Accessor(config.reducers))
-                    const outputPages = config.pages;
-                    const assetName = findAssetName(page, compilation, webpackStatsJson);
 
+                const config = self.config;
+                const locales = config.locales ? config.locales : false;
+                const baseDataDir = config.baseDataDir ? config.baseDataDir : './';
+
+                if(!config.sites || !Array.isArray(config.sites)) {
+                    throw `No array of sites found in your config.`;
+                }
+
+                config.sites.forEach((site) => {
+                    if(!site.entry) {
+                        throw 'Every site config must have an entry that matches a webpack entry'
+                    }
+
+                    const assetName = findAssetName(site.entry, compilation, webpackStatsJson);
+                    if(assetName) {
+                        throw `No matching webpack entry found for: ${site.entry}`;
+                    }
+
+                    if(!site.pages || !Array.isArray(site.pages)) {
+                        throw `No array of pages found in your ${site.entry} site config.`;
+                    }
+
+                    if(!site.reducers || !Array.isArray(site.reducers)) {
+                        throw `No valid reducers found for site: ${site.entry}`;
+                    }
+                    const siteReducer = combineReducers(es6Accessor(site.reducers));
+
+                    // Used to remove abandoned assets after the copying process
                     const appRoutes = [];
-                    outputPages.map((outputPage) => {
-                        const outPage = outputPage.page;
-                        const state = outputPage.state;
-                        const route = outputPage.route;
-                        const component = es6Accessor(outputPage.component);
+                    sites.pages.map((page) => {
+                        const isMultiplePage = page.multiPage ? true : false;
+                        const pageConfigs = generatePageConfigs(page, baseDataDir, locales, isMultiplePage)
 
-                        copyObjectProperty(compilation.assets, assetName, `${route}/${assetName}`);
-                        copyObjectProperty(compilation.assets, `${assetName}.map`, `${route}/${assetName}.map`);
-                        appRoutes.push(`${route}/${assetName}`);
+                        pageConfigs.forEach((pageConfig) => {
+                            // Copy assets from the base directory to their route
+                            copyObjectProperty(compilation.assets, assetName, `${pageConfig.appRoute}/${assetName}`);
+                            copyObjectProperty(compilation.assets, `${assetName}.map`, `${pageConfig.appRoute}/${assetName}.map`);
+                            appRoutes.push(`${pageConfig.appRoute}/${assetName}`);
 
-                        // TODO: Add middleware functionality
-                        const store = createStore(rootReducer, state);
-                        const renderedPage = ReactDOMServer.renderToString(
-                            providerWrapper(component, store)
-                        );
+                            const store = createStore(siteReducer, pageConfig.state);
+                            const renderedPage = ReactDOMServer.renderToString(
+                                providerWrapper(es6Accessor(pageConfig.component), store)
+                            );
 
-                        const template = config.template.default;
-                        const style = assets.style.replace('.js', '.css');
+                            const template = es6Accessor(config.template);
+                            const style = assets.style.replace('.js', '.css');
 
-                        const index = template(
-                            renderedPage,
-                            `${route}/${assetName}`,
-                            state,
-                            assets.manifest,
-                            assets.vendor,
-                            style
-                        );
+                            const index = template(
+                                renderedPage,
+                                `${pageConfig.appRoute}/${assetName}`,
+                                pageConfig.state,
+                                assets.manifest,
+                                assets.vendor,
+                                style
+                            );
 
-                        const outputFileName = path.join(route, outPage, 'index.html');
-                        compilation.assets[outputFileName] = new RawSource(index);
+                            const indexOutputFile = path.join(pageConfig.indexRoute, 'index.html');
+                            compilation.assets[indexOutputFile] = new RawSource(index);
+                        })
                     });
 
                     // Clean up unused assets that have been copied to other routes
@@ -74,7 +96,7 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                         delete compilation.assets[assetName];
                         delete compilation.assets[`${assetName}.map`];
                     }
-                });
+                })
 
                 done(); // ;)
             } catch (err) {
@@ -86,7 +108,5 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
 };
 
 export {
-    superAwesomeWebpackPlugin,
-    singlePageBuilder,
-    multiPageBuilder
+    superAwesomeWebpackPlugin
 }

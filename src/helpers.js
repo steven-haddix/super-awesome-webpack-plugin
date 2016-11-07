@@ -3,25 +3,61 @@ import path from 'path';
 import React from 'react'
 import { Provider } from 'react-redux'
 
-export function singlePageBuilder(dir, route, component) {
-    let page = {};
-    fs.readdirSync(dir).forEach((file) => {
-        if(!/.*\.json/.test(file)) {
-            return;
-        }
+export function generatePageConfigs(pages, baseDir, locales, isMultiPage) {
+    if(isMultiPage) {
+        return multiPageConfigBuilder(pages, baseDir, locales)
+    }
+    return singlePageConfigBuilder(pages, baseDir, locales)
+}
 
-        page = {
-            page: file.replace('.json', ''),
-            state: require(path.resolve(dir, file)),
-            route: route,
-            component
-        }
+export function singlePageConfigBuilder(page, baseDataDir, locales) {
+    let page = {};
+    locales.forEach((locale) => {
+        const pageDataPath = path.resolve(baseDataDir, locale, page.route);
+
+        fs.readdirSync(pageDataPath).forEach((pageDataFile) => {
+            if (!/.*\.json/.test(pageDataFile)) {
+                return;
+            }
+
+            page = {
+                page: pageDataFile.replace('.json', ''),
+                state: require(path.resolve(pageDataPath, pageDataFile)),
+                appRoute: `${locale}/`,
+                indexRoute: `${locale}/${page.route}/`,
+                component: page.component
+            }
+        })
     })
 
     return page;
 }
 
-export function multiPageBuilder(pages) {
+export function multiPageConfigBuilder(page, baseDataDir, locales) {
+    const pageConfigs = [];
+
+    locales.forEach((locale) => {
+        const pageDataPath = path.resolve(baseDataDir, locale, page.route);
+
+        fs.readdirSync(pageDataPath).forEach((pageDataFile) => {
+            if (!/.*\.json/.test(pageDataFile)) {
+                return;
+            }
+
+            pageConfigs.push({
+                page: pageDataFile.replace('.json', ''),
+                state: require(path.resolve(pageDataPath, pageDataFile)),
+                appRoute: `${locale}/${page.route}/`,
+                indexRoute: `${locale}/${page.route}/${pageDataFile.replace('.json', '')}/`,
+                component: page.component
+            })
+        })
+    })
+
+    return pageConfigs;
+}
+
+export function multiPageBuilderRet(pages) {
     const stateArray = [];
 
     pages.forEach(page => {
