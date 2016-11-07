@@ -109,6 +109,10 @@ Function for generating a single page configuration. The JSON data is pulled int
 Function for generating a single page for each JSON file in a directory. The JSON data is pulled into the components state.
 
 ## TODO
+## Project
+- Create example site
+- Tests & coverage reports
+
 ### Core
 - ~~Handle ES6 modules more seamlessly~~
 - Add ability to define asset to template mapping.
@@ -116,6 +120,6 @@ Function for generating a single page for each JSON file in a directory. The JSO
 - Test/add webpack-dev-server support
 
 ### Page Builders
-- Base paths for data directories
-- Support localization in builder functions to reduce configuration noise
-- Validation around configuration
+- ~~Base paths for data directories~~
+- Support localization in builder functions to reduce configuration noise (Partially complete)
+- Validation around configuration (Partially complete)

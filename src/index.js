@@ -35,31 +35,31 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                 const baseDataDir = config.baseDataDir ? config.baseDataDir : './';
 
                 if(!config.sites || !Array.isArray(config.sites)) {
-                    throw `No array of sites found in your config.`;
+                    throw new Error(`No array of sites found in your config.`);
                 }
 
                 config.sites.forEach((site) => {
                     if(!site.entry) {
-                        throw 'Every site config must have an entry that matches a webpack entry'
+                        throw new Error('Every site config must have an entry that matches a webpack entry')
                     }
 
                     const assetName = findAssetName(site.entry, compilation, webpackStatsJson);
-                    if(assetName) {
-                        throw `No matching webpack entry found for: ${site.entry}`;
+                    if(!assetName) {
+                        throw new Error(`No matching webpack entry for "${site.entry}" in ${JSON.stringify(Object.keys(assets))}`);
                     }
 
                     if(!site.pages || !Array.isArray(site.pages)) {
-                        throw `No array of pages found in your ${site.entry} site config.`;
+                        throw new Error(`No array of pages found in your ${site.entry} site config.`);
                     }
 
                     if(!site.reducers || !Array.isArray(site.reducers)) {
-                        throw `No valid reducers found for site: ${site.entry}`;
+                        throw new Error(`No valid reducers found for site: ${site.entry}`);
                     }
                     const siteReducer = combineReducers(es6Accessor(site.reducers));
 
                     // Used to remove abandoned assets after the copying process
                     const appRoutes = [];
-                    sites.pages.map((page) => {
+                    site.pages.map((page) => {
                         const isMultiplePage = page.multiPage ? true : false;
                         const pageConfigs = generatePageConfigs(page, baseDataDir, locales, isMultiplePage)
 
@@ -74,12 +74,12 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                                 providerWrapper(es6Accessor(pageConfig.component), store)
                             );
 
-                            const template = es6Accessor(config.template);
+                            const template = es6Accessor(site.template);
                             const style = assets.style.replace('.js', '.css');
 
                             const index = template(
                                 renderedPage,
-                                `${pageConfig.appRoute}/${assetName}`,
+                                `${pageConfig.appRoute}${assetName}`,
                                 pageConfig.state,
                                 assets.manifest,
                                 assets.vendor,

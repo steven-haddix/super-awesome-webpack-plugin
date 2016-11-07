@@ -10,29 +10,40 @@ export function generatePageConfigs(pages, baseDir, locales, isMultiPage) {
     return singlePageConfigBuilder(pages, baseDir, locales)
 }
 
+// TODO: Add ability to ignore locale
 export function singlePageConfigBuilder(page, baseDataDir, locales) {
-    let page = {};
+    let pageConfig = [];
     locales.forEach((locale) => {
         const pageDataPath = path.resolve(baseDataDir, locale, page.route);
+
+        let route = page.route.replace(/^\/|\/$/g, '');
+        let appRoute = `/${locale}/`;
+
+        const pathSplitter = page.route.lastIndexOf('/');
+
+        if(pathSplitter > 0) {
+            appRoute = `${appRoute}/${route.substr(0, pathSplitter)}`
+        }
 
         fs.readdirSync(pageDataPath).forEach((pageDataFile) => {
             if (!/.*\.json/.test(pageDataFile)) {
                 return;
             }
 
-            page = {
+            pageConfig.push({
                 page: pageDataFile.replace('.json', ''),
                 state: require(path.resolve(pageDataPath, pageDataFile)),
-                appRoute: `${locale}/`,
+                appRoute,
                 indexRoute: `${locale}/${page.route}/`,
                 component: page.component
-            }
+            })
         })
     })
 
-    return page;
+    return pageConfig;
 }
 
+// TODO: Add ability to ignore locale
 export function multiPageConfigBuilder(page, baseDataDir, locales) {
     const pageConfigs = [];
 
