@@ -15,12 +15,11 @@ import {
     es6Accessor
 } from './helpers'
 
-const superAwesomeWebpackPlugin = function(config) {
+function SuperAwesomeWebpackPlugin(config) {
     this.config = config;
+}
 
-};
-
-superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
+SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
     var self = this;
 
     compiler.plugin('this-compilation', function(compilation) {
@@ -109,4 +108,4 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
     });
 };
 
-export default superAwesomeWebpackPlugin;
+module.exports = SuperAwesomeWebpackPlugin;

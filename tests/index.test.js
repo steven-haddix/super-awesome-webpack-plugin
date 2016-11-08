@@ -34,7 +34,7 @@ test('should handle configuration files properly', (t) => {
         ]
     };
 
-    const superAwesomeWebpackPlugin = proxyquire('../src/index', {
+    const SuperAwesomeWebpackPlugin = proxyquire('../src/index', {
         'webpack-sources/lib/RawSource': function(value) {
             return value;
         },
@@ -74,7 +74,7 @@ test('should handle configuration files properly', (t) => {
         }
     });
 
-    const plugin = new superAwesomeWebpackPlugin.default(staticConfig);
+    const plugin = new SuperAwesomeWebpackPlugin(staticConfig);
     plugin.apply({
         plugin: function(event, callback) {
             if(event === 'this-compilation') {
