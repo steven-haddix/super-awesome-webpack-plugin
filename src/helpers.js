@@ -50,6 +50,7 @@ export function multiPageConfigBuilder(page, baseDataDir, locales) {
 
     locales.forEach((locale) => {
         const pageDataPath = path.resolve(baseDataDir, locale, page.route);
+        const route = page.route.replace(/^\/|\/$/g, '');
 
         fs.readdirSync(pageDataPath).forEach((pageDataFile) => {
             if (!/.*\.json/.test(pageDataFile)) {
@@ -59,8 +60,8 @@ export function multiPageConfigBuilder(page, baseDataDir, locales) {
             pageConfigs.push({
                 page: pageDataFile.replace('.json', ''),
                 state: require(path.resolve(pageDataPath, pageDataFile)),
-                appRoute: `/${locale}/${page.route}/`,
-                indexRoute: `/${locale}/${page.route}/${pageDataFile.replace('.json', '')}/`,
+                appRoute: `/${locale}/${route}/`,
+                indexRoute: `/${locale}/${route}/${pageDataFile.replace('.json', '')}/`,
                 component: page.component
             })
         })
@@ -152,7 +153,7 @@ export function es6Accessor(object) {
     return object;
 }
 
-function hasDefault(object) {
+export function hasDefault(object) {
     if (typeof object === 'object' && object.hasOwnProperty('default')) {
         return true;
     }

@@ -10,8 +10,8 @@
   "scripts": {
     "build": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
     "build:publish": "npm run build && npm publish",
-    "cover": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
-    "test": "cross-env NODE_ENV=test nyc babel-tape-runner tests/**/*.test.js"
+    "cover": "nyc report --reporter=lcov --reporter=text-lcov | coveralls",
+    "test": "cross-env NODE_ENV=test nyc babel-tape-runner tests/**/*.test.js | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -37,6 +37,7 @@
     "babel-preset-react": "^6.16.0",
     "babel-register": "^6.18.0",
     "babel-tape-runner": "^2.0.1",
+    "blue-tape": "^1.0.0",
     "coveralls": "^2.11.14",
     "cross-env": "^3.1.3",
     "nyc": "^8.4.0",
@@ -45,8 +46,10 @@
     "react-dom": "^15.3.2",
     "react-redux": "^4.4.5",
     "redux": "^3.6.0",
+    "tap-spec": "^4.1.1",
     "tape": "^4.6.2",
-    "webpack": "^1.13.3"
+    "webpack": "^1.13.3",
+    "webpack-sources": "^0.1.2"
   },
   "nyc": {
     "include": [

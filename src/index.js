@@ -2,7 +2,7 @@
 require("babel-register");
 
 import path from 'path';
-import RawSource from 'webpack-sources/lib/RawSource';
+const RawSource = require('webpack-sources/lib/RawSource');
 import ReactDOMServer from 'react-dom/server';
 import { createStore, combineReducers } from 'redux';
 
@@ -17,6 +17,7 @@ import {
 
 const superAwesomeWebpackPlugin = function(config) {
     this.config = config;
+
 };
 
 superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
@@ -52,7 +53,7 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                         throw new Error(`No array of pages found in your ${site.entry} site config.`);
                     }
 
-                    if(!site.reducers || !Array.isArray(site.reducers)) {
+                    if(!site.reducers) {
                         throw new Error(`No valid reducers found for site: ${site.entry}`);
                     }
                     const siteReducer = combineReducers(es6Accessor(site.reducers));
@@ -100,6 +101,7 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
 
                 done(); // ;)
             } catch (err) {
+
                 compilation.errors.push(err.stack);
                 done();
             }
@@ -107,4 +109,4 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
     });
 };
 
-export default superAwesomeWebpackPlugin
+export default superAwesomeWebpackPlugin;

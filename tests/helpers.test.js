@@ -1,7 +1,8 @@
 import test from 'tape';
 import {
-    multiPageConfigBuilder,
-    es6Accessor
+    copyObjectProperty,
+    es6Accessor,
+    hasDefault
 } from '../src/helpers';
 var proxyquire = require('proxyquire');
 
@@ -10,7 +11,7 @@ test('build single page configurations', (t) => {
         'fs': {
             readdirSync: function (path) {
                 return [
-                    'explore.json'
+                    'home.json'
                 ]
             }
         },
@@ -22,7 +23,7 @@ test('build single page configurations', (t) => {
     });
 
     const page = {
-        route: 'explore',
+        route: 'home',
         component: { test: '123' }
     };
 
@@ -31,17 +32,17 @@ test('build single page configurations', (t) => {
     t.deepEqual(pageConfigs,
         [
             {
-                page: 'explore',
+                page: 'home',
                 state: { test: '123' },
                 appRoute: '/en_US/',
-                indexRoute: '/en_US/explore/',
+                indexRoute: '/en_US/home/',
                 component: { test: '123' }
             },
             {
-                page: 'explore',
+                page: 'home',
                 state: { test: '123' },
                 appRoute: '/es_US/',
-                indexRoute: '/es_US/explore/',
+                indexRoute: '/es_US/home/',
                 component: { test: '123' }
             },
         ]);
@@ -49,12 +50,12 @@ test('build single page configurations', (t) => {
     t.end();
 });
 
-test('build single page configurations', (t) => {
+test('build single page nested configurations', (t) => {
     const helpers = proxyquire('../src/helpers', {
         'fs': {
             readdirSync: function (path) {
                 return [
-                    'test/explore.json'
+                    'test/home.json'
                 ]
             }
         },
@@ -66,7 +67,7 @@ test('build single page configurations', (t) => {
     });
 
     const page = {
-        route: '/test/explore/',
+        route: '/test/home/',
         component: { test: '123' }
     };
 
@@ -75,17 +76,17 @@ test('build single page configurations', (t) => {
     t.deepEqual(pageConfigs,
         [
             {
-                page: 'test/explore',
+                page: 'test/home',
                 state: { test: '123' },
                 appRoute: '/en_US/test/',
-                indexRoute: '/en_US/test/explore/',
+                indexRoute: '/en_US/test/home/',
                 component: { test: '123' }
             },
             {
-                page: 'test/explore',
+                page: 'test/home',
                 state: { test: '123' },
                 appRoute: '/es_US/test/',
-                indexRoute: '/es_US/test/explore/',
+                indexRoute: '/es_US/test/home/',
                 component: { test: '123' }
             },
         ]);
@@ -98,8 +99,8 @@ test('build multi page configurations', (t) => {
         'fs': {
             readdirSync: function (path) {
                 return [
-                    '4-for-4-meal.json',
-                    'bakery.json',
+                    'product1.json',
+                    'product2.json',
                 ]
             }
         },
@@ -111,7 +112,7 @@ test('build multi page configurations', (t) => {
     });
 
     const page = {
-        route: 'menu/category',
+        route: '/product',
         component: { test: '123' }
     };
 
@@ -120,31 +121,31 @@ test('build multi page configurations', (t) => {
     t.deepEqual(pageConfigs,
     [
         {
-            page: '4-for-4-meal',
+            page: 'product1',
             state: { test: '123' },
-            appRoute: '/en_US/menu/category/',
-            indexRoute: '/en_US/menu/category/4-for-4-meal/',
+            appRoute: '/en_US/product/',
+            indexRoute: '/en_US/product/product1/',
             component: { test: '123' }
         },
         {
-            page: 'bakery',
+            page: 'product2',
             state: { test: '123' },
-            appRoute: '/en_US/menu/category/',
-            indexRoute: '/en_US/menu/category/bakery/',
+            appRoute: '/en_US/product/',
+            indexRoute: '/en_US/product/product2/',
             component: { test: '123' }
         },
         {
-            page: '4-for-4-meal',
+            page: 'product1',
             state: { test: '123' },
-            appRoute: '/es_US/menu/category/',
-            indexRoute: '/es_US/menu/category/4-for-4-meal/',
+            appRoute: '/es_US/product/',
+            indexRoute: '/es_US/product/product1/',
             component: { test: '123' }
         },
         {
-            page: 'bakery',
+            page: 'product2',
             state: { test: '123' },
-            appRoute: '/es_US/menu/category/',
-            indexRoute: '/es_US/menu/category/bakery/',
+            appRoute: '/es_US/product/',
+            indexRoute: '/es_US/product/product2/',
             component: { test: '123' }
         }
     ]);
@@ -163,8 +164,58 @@ test('properly access es6 default objects', (t) => {
     t.end();
 });
 
-test('properly access es6 default objects', (t) => {
+test('properly access objects if not es6 objects', (t) => {
     const es6Object = { test: '123' }
     t.deepEqual(es6Accessor(es6Object), { test: '123' }, 'outcome equals { test: 123 }');
     t.end();
 });
+
+test('properly access an array of es6 objects', (t) => {
+    const es6Object = {
+        default: function() {
+            return '123'
+        }
+    }
+
+    t.deepEqual(es6Accessor([es6Object])[0](), '123', 'outcome equals { test: 123 }');
+    t.end();
+});
+
+test('copy object properties', (t) => {
+    const object = {
+        test1: {
+            property: 'test'
+        }
+    }
+
+    copyObjectProperty(object, 'test1', 'test2')
+
+    t.deepEqual(object, {
+        test1: {
+            property: 'test'
+        },
+        test2: {
+            property: 'test'
+        }
+    })
+
+    t.end();
+})
+
+test('returns true if object has default property', (t) => {
+    const object = {
+        default: function() {}
+    }
+
+    t.equal(hasDefault(object), true)
+    t.end();
+})
+
+test('returns false if object has no default property', (t) => {
+    const object = {
+        default: function() {}
+    }
+
+    t.equal(hasDefault(object), true)
+    t.end();
+})
