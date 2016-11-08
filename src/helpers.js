@@ -17,12 +17,13 @@ export function singlePageConfigBuilder(page, baseDataDir, locales) {
         const pageDataPath = path.resolve(baseDataDir, locale, page.route);
 
         let route = page.route.replace(/^\/|\/$/g, '');
-        let appRoute = `/${locale}/`;
+        let appRoute = `${locale}`;
 
-        const pathSplitter = page.route.lastIndexOf('/');
-
+        const pathSplitter = route.lastIndexOf('/');
         if(pathSplitter > 0) {
-            appRoute = `${appRoute}/${route.substr(0, pathSplitter)}`
+            appRoute = `/${appRoute}/${route.substr(0, pathSplitter)}/`
+        } else {
+            appRoute = `/${appRoute}/`
         }
 
         fs.readdirSync(pageDataPath).forEach((pageDataFile) => {
@@ -34,7 +35,7 @@ export function singlePageConfigBuilder(page, baseDataDir, locales) {
                 page: pageDataFile.replace('.json', ''),
                 state: require(path.resolve(pageDataPath, pageDataFile)),
                 appRoute,
-                indexRoute: `${locale}/${page.route}/`,
+                indexRoute: `/${locale}/${route}/`,
                 component: page.component
             })
         })
@@ -58,35 +59,14 @@ export function multiPageConfigBuilder(page, baseDataDir, locales) {
             pageConfigs.push({
                 page: pageDataFile.replace('.json', ''),
                 state: require(path.resolve(pageDataPath, pageDataFile)),
-                appRoute: `${locale}/${page.route}/`,
-                indexRoute: `${locale}/${page.route}/${pageDataFile.replace('.json', '')}/`,
+                appRoute: `/${locale}/${page.route}/`,
+                indexRoute: `/${locale}/${page.route}/${pageDataFile.replace('.json', '')}/`,
                 component: page.component
             })
         })
     })
 
     return pageConfigs;
-}
-
-export function multiPageBuilderRet(pages) {
-    const stateArray = [];
-
-    pages.forEach(page => {
-        fs.readdirSync(page.dir).forEach((file) => {
-            if(!/.*\.json/.test(file)) {
-                return;
-            }
-
-            stateArray.push({
-                page: file.replace('.json', ''),
-                state: require(path.resolve(page.dir, file)),
-                route: page.route,
-                component: page.component
-            })
-        })
-    })
-
-    return stateArray;
 }
 
 export function copyObjectProperty(object, oldKey, newKey) {

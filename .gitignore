@@ -2,3 +2,5 @@ node_modules/
 dist/
 .idea/
 lib/
+coverage
+.nyc_output

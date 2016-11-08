@@ -65,9 +65,9 @@ superAwesomeWebpackPlugin.prototype.apply = function(compiler) {
 
                         pageConfigs.forEach((pageConfig) => {
                             // Copy assets from the base directory to their route
-                            copyObjectProperty(compilation.assets, assetName, `${pageConfig.appRoute}/${assetName}`);
-                            copyObjectProperty(compilation.assets, `${assetName}.map`, `${pageConfig.appRoute}/${assetName}.map`);
-                            appRoutes.push(`${pageConfig.appRoute}/${assetName}`);
+                            copyObjectProperty(compilation.assets, assetName, `${pageConfig.appRoute}${assetName}`);
+                            copyObjectProperty(compilation.assets, `${assetName}.map`, `${pageConfig.appRoute}${assetName}.map`);
+                            appRoutes.push(`${pageConfig.appRoute}${assetName}`);
 
                             const store = createStore(siteReducer, pageConfig.state);
                             const renderedPage = ReactDOMServer.renderToString(

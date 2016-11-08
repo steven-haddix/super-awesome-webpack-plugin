@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/steven-haddix/super-awesome-webpack-plugin.svg?branch=master)](https://travis-ci.org/steven-haddix/super-awesome-webpack-plugin)
+
 # Super Awesome Webpack Plugin
 An opinionated Webpack plugin for generating static websites using React and Redux.
 
