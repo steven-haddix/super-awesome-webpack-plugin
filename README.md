@@ -58,12 +58,10 @@ const template = require('./template');
 
 // Components
 const home_component = require('./src/js/pages/Home');
-const explore_component = require('./src/js/pages/Explore');
-const category_component = require('./src/js/pages/Category');
+const product_component = require('./src/js/pages/Product');
 
 // Reducers
-const categories_reducer = require('./src/js/redux/reducers/categories');
-const category_reducer = require('./src/js/redux/reducers/category');
+const product_reducer = require('./src/js/redux/reducers/product');
 const content_reducer = require('./src/js/redux/reducers/content');
 
 
@@ -79,7 +77,10 @@ const staticConfig = {
         pages: [
             /**
              * Pages dictate what index.html's get created. Each page must have a matching
-             * .JSON fiele at /[baseDataDir]/[route]
+             * .JSON fiele at /[baseDataDir]/[route].
+             *
+             * NOTE: If you use multiple pages per entry you will need to use something like react-router
+             * to properly serve the correct page on the client entry.
              *
              * This site will generate four pages.
              * - /en_US/home/index.html
@@ -90,7 +91,7 @@ const staticConfig = {
             { route: 'home', component: home_component },
             { route: 'explore', component: explore_component }
         ],
-        reducers: [ content_reducer ]
+        reducers: { content: content_reducer }
     },
     {
       entry: 'product',
@@ -100,9 +101,9 @@ const staticConfig = {
          * multiPage configurations allow you to generate an index.html for each
          * JSON data file at the specified route. See Example Data Directory below.
          */
-        { route: 'menu/category', component: category_component, multiPage: true },
+        { route: 'menu/product', component: product_component, multiPage: true },
       ],
-      reducers: [ category_reducer, content_reducer ]
+      reducers: { product: product_reducer, content: content_reducer }
     }
   ]
 };
@@ -116,18 +117,18 @@ const staticConfig = {
         /explore
             explore.json // /en_US/explore/index.html
         /products
-            product_1.json // /en_US/prodcuts/product_1/index.html
-            product_2.json // /en_US/prodcuts/product_2/index.html
-            product_3.json // /en_US/prodcuts/product_3/index.html
+            product_1.json // /en_US/products/product_1/index.html
+            product_2.json // /en_US/products/product_2/index.html
+            product_3.json // /en_US/products/product_3/index.html
     /en_US
         /home
             home.json // /es_US/home/index.html
         /explore
             explore.json // /es_US/explore/index.html
         /products
-            product_1.json // /es_US/prodcuts/product_1/index.html
-            product_2.json // /es_US/prodcuts/product_2/index.html
-            product_3.json // /es_US/prodcuts/product_3/index.html
+            product_1.json // /es_US/products/product_1/index.html
+            product_2.json // /es_US/products/product_2/index.html
+            product_3.json // /es_US/products/product_3/index.html
 ```
 ### Example Template File
 ```javascript
