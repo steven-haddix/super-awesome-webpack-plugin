@@ -77,7 +77,7 @@ const staticConfig = {
         pages: [
             /**
              * Pages dictate what index.html's get created. Each page must have a matching
-             * .JSON fiele at /[baseDataDir]/[route].
+             * .JSON file at /[baseDataDir]/[route].
              *
              * NOTE: If you use multiple pages per entry you will need to use something like react-router
              * to properly serve the correct page on the client entry.
