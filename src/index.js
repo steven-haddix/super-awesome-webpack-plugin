@@ -4,7 +4,7 @@ require("babel-register");
 import path from 'path';
 const RawSource = require('webpack-sources/lib/RawSource');
 import ReactDOMServer from 'react-dom/server';
-import { createStore, combineReducers } from 'redux';
+import { createStore } from 'redux';
 
 import {
     getAssetsFromCompilation,
@@ -12,7 +12,8 @@ import {
     copyObjectProperty,
     providerWrapper,
     generatePageConfigs,
-    es6Accessor
+    es6Accessor,
+    es6SafeCombineReducers
 } from './helpers'
 
 function SuperAwesomeWebpackPlugin(config) {
@@ -55,7 +56,7 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                     if(!site.reducers) {
                         throw new Error(`No valid reducers found for site: ${site.entry}`);
                     }
-                    const siteReducer = combineReducers(es6Accessor(site.reducers));
+                    const siteReducer = es6SafeCombineReducers(site.reducers);
 
                     // Used to remove abandoned assets after the copying process
                     const appRoutes = [];

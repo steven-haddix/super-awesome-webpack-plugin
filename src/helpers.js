@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import React from 'react'
 import { Provider } from 'react-redux'
+import { combineReducers } from 'redux';
 
 export function generatePageConfigs(pages, baseDir, locales, isMultiPage) {
     if(isMultiPage) {
@@ -133,6 +134,22 @@ export function getAssetsFromCompilation(compilation, webpackStatsJson) {
     }
 
     return assets;
+}
+
+export function es6SafeCombineReducers(reducers) {
+    const es6SafeReducers = {};
+
+    if(typeof reducers !== 'object' || Array.isArray(reducers)) {
+        throw new Error('Reducers must be an Object whose keys represent the reducers name { product: product_reducer }')
+    }
+
+    Object.keys(reducers).forEach((reducer) => {
+        if(reducers.hasOwnProperty(reducer)) {
+            es6SafeReducers[reducer] = es6Accessor(reducers[reducer]);
+        }
+    });
+
+    return combineReducers(es6SafeReducers);
 }
 
 export function es6Accessor(object) {
