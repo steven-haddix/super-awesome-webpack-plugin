@@ -76,16 +76,15 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                             );
 
                             const template = es6Accessor(site.template);
-                            const style = assets.style.replace('.js', '.css');
 
-                            const index = template(
-                                renderedPage,
-                                `${pageConfig.appRoute}${assetName}`,
-                                pageConfig.state,
-                                assets.manifest,
-                                assets.vendor,
-                                style
-                            );
+                            const assets = {
+                                html: renderedPage,
+                                state: pageConfig.state,
+                                app: `${pageConfig.appRoute}${assetName}`,
+                                webpack: assets
+                            }
+
+                            const index = template(assets);
 
                             const indexOutputFile = path.join(pageConfig.indexRoute, 'index.html');
                             compilation.assets[indexOutputFile] = new RawSource(index);

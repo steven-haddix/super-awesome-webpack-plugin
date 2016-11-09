@@ -43,7 +43,7 @@ plugins: [
     new SuperAwesomeWebpackPlugin(buildConfig)
 ]
 ```
-## Example Confguration
+## Example Configuration
 
 ### Example configuration file
 ```javascript
@@ -133,24 +133,24 @@ const staticConfig = {
 ### Example Template File
 ```javascript
 // Currently only supports a function that returns html string
-export default function (html, app, manifest, vendor, css) {
+export default function (assets) {
     return `
     <html lang="en">
         <head>
             <title>My Store</title>
             <script>
-                window.__data = ${JSON.stringify(state)};
+                window.__data = ${JSON.stringify(assets.state)};
             </script>
         </head>
-        <link rel="stylesheet" type="text/css" href="/${css}" />
+        <link rel="stylesheet" type="text/css" href="/${assets.webpack.style.replace('js', 'css')}" />
         <body id="body">
             <div id="app">
-                ${html}
+                ${assets.html}
             </div>
             <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-            <script src="/${manifest}"></script>
-            <script src="/${vendor}"></script>
-            <script src="${app}"></script>
+            <script src="/${assets.webpack.manifest}"></script>
+            <script src="/${assets.webpack.vendor}"></script>
+            <script src="${assets.app}"></script>
         </body>
     </html>
     `
@@ -167,8 +167,11 @@ export default function (html, app, manifest, vendor, css) {
 - Add ability to define asset-to-template mapping.
 - Integrate with react-router for configuration field mapping
 - Test/add webpack-dev-server support
+- Change template to accept generic objects
+- Locale needs to handled better.
 
 ### Page Builders
 - ~~Base paths for data directories~~
 - Support localization in builder functions to reduce configuration noise (Partially complete)
 - Validation around configuration (Partially complete)
+- Remove multiPage flag in favor of a better architecture

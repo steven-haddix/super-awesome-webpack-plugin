@@ -20,8 +20,15 @@ test('should handle configuration files properly', (t) => {
         sites: [
             {
                 entry: 'main',
-                template: function(html, app, state, manifest, vendor, style) {
-                    return { html: '', app, state, manifest, vendor, style }
+                template: function(assets) {
+                    return {
+                        html: '',
+                        app: assets.app,
+                        state: assets.state,
+                        manifest: assets.webpack.manifest,
+                        vendor: assets.webpack.vendor,
+                        style: assets.webpack.style.replace('js', 'css')
+                    }
                 },
                 pages: [
                     { route: 'home', component: function() {} },
