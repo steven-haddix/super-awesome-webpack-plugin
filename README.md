@@ -34,9 +34,9 @@ New up the plugin and add it to the plugin array
 ```javascript
 
 plugins: [
-    // The plugin supports chunk loading, but is currently hardcoded for vendor and manifest file only.
+
     new webpack.optimize.CommonsChunkPlugin({
-        // Must be 'vendor', must be 'manifest'
+        // These will be output as assets.webpack.vendor and assets.webpack.manifest in the template
         names: ['vendor', 'manifest'],
         minChunks: Infinity
     })
