@@ -1,7 +1,7 @@
 {
   "name": "super-awesome-webpack-plugin",
   "title": "Super Awesome Webpack Plugin",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "An opinionated Webpack plugin for generating static websites using React and Redux.",
   "main": "lib/index.js",
   "files": [
@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
-    "build:publish": "npm run build && npm publish",
+    "build:publish": "npm run build && npm version patch && npm publish",
     "cover": "nyc report --reporter=lcov --reporter=text-lcov | coveralls",
     "test": "cross-env NODE_ENV=test nyc babel-tape-runner tests/**/*.test.js | tap-spec"
   },
