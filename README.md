@@ -17,7 +17,7 @@ Require plugin & build config
 const SuperAwesomeWebpackPlugin = require('super-awesome-webpack-plugin');
 const staticBuildConfig = require('./static.config');
 ```
-Each entry will be use
+Each site entry be matched to the sites build entries and added to its index.html
 ```javascript
 entry: {
     // site entry
