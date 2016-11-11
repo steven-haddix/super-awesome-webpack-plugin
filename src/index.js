@@ -3,17 +3,18 @@ require("babel-register");
 
 import path from 'path';
 const RawSource = require('webpack-sources/lib/RawSource');
-import ReactDOMServer from 'react-dom/server';
+import { renderToString } from 'react-dom/server'
 import { createStore } from 'redux';
 
+import { rootRoute, matchRoute } from './routingUtils'
+import { walkSync } from './fileUtils'
+import { findAssetName, getAssetsFromCompilation } from './webpackUtils';
 import {
-    getAssetsFromCompilation,
-    findAssetName,
     copyObjectProperty,
     providerWrapper,
-    generatePageConfigs,
     es6Accessor,
-    es6SafeCombineReducers
+    es6SafeCombineReducers,
+    trimStringRight
 } from './helpers'
 
 function SuperAwesomeWebpackPlugin(config) {
@@ -21,85 +22,71 @@ function SuperAwesomeWebpackPlugin(config) {
 }
 
 SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
-    var self = this;
+    const self = this;
 
     compiler.plugin('this-compilation', function(compilation) {
         compilation.plugin('optimize-assets', function(_, done) {
-            var webpackStats = compilation.getStats();
-            var webpackStatsJson = webpackStats.toJson();
-
             try {
+                const webpackStats = compilation.getStats();
+                const webpackStatsJson = webpackStats.toJson();
                 const assets = getAssetsFromCompilation(compilation, webpackStatsJson);
 
                 const config = self.config;
-                const locales = config.locales ? config.locales : false;
-                const baseDataDir = config.baseDataDir ? config.baseDataDir : './';
+                const dataDir = config.dataDir;
 
-                if(!config.sites || !Array.isArray(config.sites)) {
-                    throw new Error(`No array of sites found in your config.`);
-                }
+                const dataFiles = walkSync(dataDir, [], /.*\.json/);
 
                 config.sites.forEach((site) => {
-                    if(!site.entry) {
-                        throw new Error('Every site config must have an entry that matches a webpack entry')
-                    }
+                    const appRoutes = [];
+                    const asset = findAssetName(site.entry, compilation, webpackStatsJson);
 
-                    const assetName = findAssetName(site.entry, compilation, webpackStatsJson);
-                    if(!assetName) {
+                    if(!asset) {
                         throw new Error(`No matching webpack entry for "${site.entry}" in ${JSON.stringify(Object.keys(assets))}`);
                     }
 
-                    if(!site.pages || !Array.isArray(site.pages)) {
-                        throw new Error(`No array of pages found in your ${site.entry} site config.`);
-                    }
-
-                    if(!site.reducers) {
-                        throw new Error(`No valid reducers found for site: ${site.entry}`);
-                    }
                     const siteReducer = es6SafeCombineReducers(site.reducers);
+                    const routes = rootRoute(site.component, site.routes)
 
-                    // Used to remove abandoned assets after the copying process
-                    const appRoutes = [];
-                    site.pages.map((page) => {
-                        const isMultiplePage = page.multiPage ? true : false;
-                        const pageConfigs = generatePageConfigs(page, baseDataDir, locales, isMultiplePage)
+                    dataFiles.map((dataFile) => {
+                        const indexRoute = dataFile.replace('.json', '');
 
-                        pageConfigs.forEach((pageConfig) => {
-                            // Copy assets from the base directory to their route
-                            copyObjectProperty(compilation.assets, assetName, `${pageConfig.appRoute}${assetName}`);
-                            copyObjectProperty(compilation.assets, `${assetName}.map`, `${pageConfig.appRoute}${assetName}.map`);
-                            appRoutes.push(`${pageConfig.appRoute}${assetName}`);
-
-                            const store = createStore(siteReducer, pageConfig.state);
-                            const renderedPage = ReactDOMServer.renderToString(
-                                providerWrapper(es6Accessor(pageConfig.component), store)
+                        matchRoute(indexRoute, routes, (route) => {
+                            if(!route) {
+                                throw new Error(`No matching route for file: ${indexRoute}`)
+                            }
+                            const state = require(path.resolve(dataFile));
+                            const appRoute = trimStringRight(dataFile, '/', 1);
+                            const store = createStore(siteReducer, state);
+                            const renderedPage = renderToString(
+                                providerWrapper(es6Accessor(route.component), store)
                             );
 
                             const template = es6Accessor(site.template);
                             const indexAssets = {
                                 html: renderedPage,
-                                state: pageConfig.state,
-                                app: `${pageConfig.appRoute}${assetName}`,
+                                state: state,
+                                app: `${appRoute}/${asset}`,
                                 webpack: assets
-                            }
+                            };
 
-                            const index = template(indexAssets);
+                            copyObjectProperty(compilation.assets, asset, `${appRoute}/${asset}`);
+                            copyObjectProperty(compilation.assets, `${asset}.map`, `${appRoute}${asset}.map`);
+                            appRoutes.push(`${appRoute}/${asset}`);
 
-                            const indexOutputFile = path.join(pageConfig.indexRoute, 'index.html');
-                            compilation.assets[indexOutputFile] = new RawSource(index);
-                        })
-                    });
+                            compilation.assets[path.join(indexRoute, 'index.html')] = new RawSource(template(indexAssets));
+                        });
+                    })
 
                     // Clean up unused assets that have been copied to other routes
-                    if(!appRoutes.includes(assetName)) {
-                        delete compilation.assets[assetName];
-                        delete compilation.assets[`${assetName}.map`];
+                    if(!appRoutes.includes(asset)) {
+                        delete compilation.assets[asset];
+                        delete compilation.assets[`${asset}.map`];
                     }
+
                 })
 
-                done(); // ;)
+                done();
             } catch (err) {
-
                 compilation.errors.push(err.stack);
                 done();
             }

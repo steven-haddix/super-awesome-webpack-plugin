@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/steven-haddix/super-awesome-webpack-plugin.svg?branch=master)](https://travis-ci.org/steven-haddix/super-awesome-webpack-plugin) [![Coverage Status](https://coveralls.io/repos/github/steven-haddix/super-awesome-webpack-plugin/badge.svg)](https://coveralls.io/github/steven-haddix/super-awesome-webpack-plugin)
 
 # Super Awesome Webpack Plugin
-An opinionated Webpack plugin for generating static websites using React and Redux.
+A slightly opinionated Webpack plugin for generating static websites using React, React Router & Redux.
 
 ## Install
 ```bash
@@ -48,11 +48,7 @@ plugins: [
 ### Example configuration file
 ```javascript
 /**
- * Template used to generate index.html files.
- * Must be a function that takes the following parameters and returns a string
- * function (html, app, state, manifest, vendor, css) {
- *      return '';
- * }
+ * Template used to generate index.html files. See example below.
  */
 const template = require('./template');
 
@@ -66,9 +62,7 @@ const content_reducer = require('./src/js/redux/reducers/content');
 
 
 const staticConfig = {
-  baseDataDir: './data',
-  // Adding locales will cause the pages to be multiplied for each locale.
-  locales: ['en_US', 'es_US'],
+  dataDir: './data',
   sites: [
     {
         // All pages under this site will share this entry, template, and reducers
@@ -77,10 +71,10 @@ const staticConfig = {
         pages: [
             /**
              * Pages dictate what index.html's get created. Each page must have a matching
-             * .JSON file at /[baseDataDir]/[route].
+             * .JSON file at /[dataDir]/[route].
              *
              * NOTE: If you use multiple pages per entry you will need to use something like react-router
-             * to properly serve the correct page on the client entry.
+             * to properly serve the correct page in the client.
              *
              * This site will generate four pages.
              * - /en_US/home/index.html
@@ -88,8 +82,8 @@ const staticConfig = {
              * - /en_US/explore/index.html
              * - /es_US/explore/index.html
              */
-            { route: 'home', component: home_component },
-            { route: 'explore', component: explore_component }
+            { route: '/*/home', component: home_component },
+            { route: '/*/explore', component: explore_component }
         ],
         reducers: { content: content_reducer }
     },
@@ -97,11 +91,7 @@ const staticConfig = {
       entry: 'product',
       template,
       pages: [
-        /**
-         * multiPage configurations allow you to generate an index.html for each
-         * JSON data file at the specified route. See Example Data Directory below.
-         */
-        { route: 'menu/product', component: product_component, multiPage: true },
+        { route: '/*/menu/product', component: product_component},
       ],
       reducers: { product: product_reducer, content: content_reducer }
     }
@@ -132,7 +122,16 @@ const staticConfig = {
 ```
 ### Example Template File
 ```javascript
-// Currently only supports a function that returns html string
+/**
+ * Template must be a function that accepts a single configuration and returns a string.
+ * assets = {
+ *  html: <rendered html page>,
+ *  state: <state object>,
+ *  app: <path to js file>,,=
+ *  webpack: {<all assets generated during webpack bundling>}
+ * }
+ *
+ **/
 export default function (assets) {
     return `
     <html lang="en">
@@ -160,18 +159,19 @@ export default function (assets) {
 ## TODO
 ## Project
 - Create example site
-- Tests & coverage reports
+- ~~Tests & coverage reports~~
 
 ### Core
 - ~~Handle ES6 modules more seamlessly~~
 - Add ability to define asset-to-template mapping.
-- Integrate with react-router for configuration field mapping
-- Test/add webpack-dev-server support
-- Change template to accept generic objects
-- Locale needs to handled better.
+- ~~Integrate with react-router for configuration field mapping~~
+- ~~Test/add webpack-dev-server support~~
+- ~~Change template to accept generic objects~~
+- ~~Locale needs to be handled better.~~
+- Abstract state management so users have more flexibility.
 
 ### Page Builders
 - ~~Base paths for data directories~~
-- Support localization in builder functions to reduce configuration noise (Partially complete)
+- ~~Support localization in builder functions to reduce configuration noise (Partially complete)~~
 - Validation around configuration (Partially complete)
-- Remove multiPage flag in favor of a better architecture
+- ~~Remove multiPage flag in favor of a better architecture~~
