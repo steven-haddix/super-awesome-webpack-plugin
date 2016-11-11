@@ -4,7 +4,7 @@ var proxyquire = require('proxyquire');
 
 // TODO: Refactor to be more modular and have better acceptance criteria
 test('should handle configuration files properly', (t) => {
-    const component = class Category extends React.Component {
+    const component = class Product extends React.Component {
         constructor() {
             super();
         }
@@ -15,11 +15,11 @@ test('should handle configuration files properly', (t) => {
     }
 
     const staticConfig = {
-        baseDataDir: './data',
-        locales: ['en_US', 'es_US'],
+        dataDir: './tests/fakeDirectory',
         sites: [
             {
                 entry: 'main',
+                component: component,
                 template: function(assets) {
                     return {
                         html: '',
@@ -30,9 +30,11 @@ test('should handle configuration files properly', (t) => {
                         style: assets.webpack.style.replace('js', 'css')
                     }
                 },
-                pages: [
-                    { route: 'home', component: function() {} },
-                    { route: 'explore', component: function() {} }
+                routes: [
+                    { path: '/*/fake1', component: component },
+                    { path: '/*/fake2', component: component },
+                    { path: '/**/fake', component: component }
+
                 ],
                 reducers: { content: function() {
                     return []
@@ -45,7 +47,7 @@ test('should handle configuration files properly', (t) => {
         'webpack-sources/lib/RawSource': function(value) {
             return value;
         },
-        './helpers': {
+        './webpackUtils': {
             findAssetName: function() {
                 return 'main.js'
             },
@@ -57,6 +59,8 @@ test('should handle configuration files properly', (t) => {
                     vendor: 'vendor.js'
                 }
             },
+        },
+        './helpers': {
             generatePageConfigs: function() {
                 return [
                     {
@@ -92,19 +96,33 @@ test('should handle configuration files properly', (t) => {
                         if(event === 'optimize-assets') {
                             callback({}, () => {
                                 t.deepEqual(assets,  {
-                                    '/en_US/test/home/index.html': {
-                                        app: '/en_US/test/main.js',
+                                    'tests/fakeDirectory/fake/index.html': {
+                                        app: 'tests/fakeDirectory/main.js',
                                         html: '',
                                         manifest: 'manifest.js',
-                                        state: { content: '123' },
+                                        state: {
+                                            content: {}
+                                        },
                                         style: 'style.css',
                                         vendor: 'vendor.js'
                                     },
-                                    '/es_US/test/home/index.html': {
-                                        app: '/es_US/test/main.js',
+                                    'tests/fakeDirectory/fakeSubDirectory/fake1/index.html': {
+                                        app: 'tests/fakeDirectory/fakeSubDirectory/main.js',
                                         html: '',
                                         manifest: 'manifest.js',
-                                        state: { content: '123' },
+                                        state: {
+                                            content: {}
+                                        },
+                                        style: 'style.css',
+                                        vendor: 'vendor.js'
+                                    },
+                                    'tests/fakeDirectory/fakeSubDirectory/fake2/index.html': {
+                                        app: 'tests/fakeDirectory/fakeSubDirectory/main.js',
+                                        html: '',
+                                        manifest: 'manifest.js',
+                                        state: {
+                                            content: {}
+                                        },
                                         style: 'style.css',
                                         vendor: 'vendor.js'
                                     }

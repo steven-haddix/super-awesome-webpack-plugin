@@ -1,159 +1,16 @@
 import test from 'tape';
+import blueTape from 'blue-tape';
+import { combineReducers } from 'redux';
+var proxyquire = require('proxyquire');
+
 import {
     copyObjectProperty,
     es6Accessor,
     es6SafeCombineReducers,
-    hasDefault
+    hasDefault,
+    trimStringRight
 } from '../src/helpers';
-import { combineReducers } from 'redux';
-var proxyquire = require('proxyquire');
 
-test('singlePageConfigBuilder', (t) => {
-    const helpers = proxyquire('../src/helpers', {
-        'fs': {
-            readdirSync: function (path) {
-                return [
-                    'home.json'
-                ]
-            }
-        },
-        'path': {
-            resolve: function(path) {
-                return '../tests/state.stub.js'
-            }
-        }
-    });
-
-    const page = {
-        route: 'home',
-        component: { test: '123' }
-    };
-
-    const pageConfigs = helpers.singlePageConfigBuilder(page, './data', ['en_US', 'es_US'])
-
-    t.deepEqual(pageConfigs,
-        [
-            {
-                page: 'home',
-                state: { test: '123' },
-                appRoute: '/en_US/',
-                indexRoute: '/en_US/home/',
-                component: { test: '123' }
-            },
-            {
-                page: 'home',
-                state: { test: '123' },
-                appRoute: '/es_US/',
-                indexRoute: '/es_US/home/',
-                component: { test: '123' }
-            },
-        ], 'should match expected configuration output with no nested paths');
-
-    t.end();
-});
-
-test('singlePageConfigBuilder', (t) => {
-    const helpers = proxyquire('../src/helpers', {
-        'fs': {
-            readdirSync: function (path) {
-                return [
-                    'test/home.json'
-                ]
-            }
-        },
-        'path': {
-            resolve: function(path) {
-                return '../tests/state.stub.js'
-            }
-        }
-    });
-
-    const page = {
-        route: '/test/home/',
-        component: { test: '123' }
-    };
-
-    const pageConfigs = helpers.singlePageConfigBuilder(page, './data', ['en_US', 'es_US'])
-
-    t.deepEqual(pageConfigs,
-        [
-            {
-                page: 'test/home',
-                state: { test: '123' },
-                appRoute: '/en_US/test/',
-                indexRoute: '/en_US/test/home/',
-                component: { test: '123' }
-            },
-            {
-                page: 'test/home',
-                state: { test: '123' },
-                appRoute: '/es_US/test/',
-                indexRoute: '/es_US/test/home/',
-                component: { test: '123' }
-            },
-        ], 'should match expected configuration output with nested paths');
-
-    t.end();
-});
-
-test('multiPageConfigBuilder', (t) => {
-    const helpers = proxyquire('../src/helpers', {
-        'fs': {
-            readdirSync: function (path) {
-                return [
-                    'product1.json',
-                    'product2.json',
-                ]
-            }
-        },
-        'path': {
-            resolve: function(path) {
-                return '../tests/state.stub.js'
-            }
-        }
-    });
-
-    const page = {
-        route: '/product',
-        component: { test: '123' }
-    };
-
-    const pageConfigs = helpers.multiPageConfigBuilder(page, './data', ['en_US', 'es_US'])
-
-    t.deepEqual(pageConfigs,
-    [
-        {
-            page: 'product1',
-            state: { test: '123' },
-            appRoute: '/en_US/product/',
-            indexRoute: '/en_US/product/product1/',
-            component: { test: '123' }
-        },
-        {
-            page: 'product2',
-            state: { test: '123' },
-            appRoute: '/en_US/product/',
-            indexRoute: '/en_US/product/product2/',
-            component: { test: '123' }
-        },
-        {
-            page: 'product1',
-            state: { test: '123' },
-            appRoute: '/es_US/product/',
-            indexRoute: '/es_US/product/product1/',
-            component: { test: '123' }
-        },
-        {
-            page: 'product2',
-            state: { test: '123' },
-            appRoute: '/es_US/product/',
-            indexRoute: '/es_US/product/product2/',
-            component: { test: '123' }
-        }
-    ], 'should match expected configuration output');
-
-    t.end();
-});
 
 test('es6Accessor', (t) => {
     const es6Object = {
@@ -170,7 +27,6 @@ test('es6Accessor', (t) => {
     const nonEs6Object = { test: '123' }
 
     t.deepEqual(es6Accessor(nonEs6Object), { test: '123' }, 'should handle non-es6 objects');
-
 
     t.end();
 });
@@ -243,5 +99,13 @@ test('es6SafeCombineReducers', (t) => {
         'function output should match input minus "default" wrappers'
     );
     t.throws(() => helpers.es6SafeCombineReducers([]), 'should throw error if in is an array');
+    t.end();
+})
+
+test('trimStringRight', (t) => {
+    t.equal(trimStringRight('part1/part2/part3', '/', 1), 'part1/part2', 'should remove 1 place from the right side')
+    t.equal(trimStringRight('part1/part2/part3', '/', 2), 'part1', 'should remove 2 places from the right side')
+    t.equal(trimStringRight('part1/part2/part3', '/', 3), '')
+
     t.end();
 })

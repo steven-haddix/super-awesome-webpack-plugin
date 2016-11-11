@@ -160,15 +160,15 @@ export default function (assets) {
 ## TODO
 ## Project
 - Create example site
-- Tests & coverage reports
+- ~~Tests & coverage reports~~
 
 ### Core
 - ~~Handle ES6 modules more seamlessly~~
 - Add ability to define asset-to-template mapping.
 - Integrate with react-router for configuration field mapping
-- Test/add webpack-dev-server support
-- Change template to accept generic objects
-- Locale needs to handled better.
+- ~~Test/add webpack-dev-server support~~
+- ~~Change template to accept generic objects~~
+- Locale needs to be handled better.
 
 ### Page Builders
 - ~~Base paths for data directories~~
