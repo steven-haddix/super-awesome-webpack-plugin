@@ -53,6 +53,7 @@ plugins: [
 const template = require('./template');
 
 // Components
+const layout_component = require('./src/js/pages/Layout');
 const home_component = require('./src/js/pages/Home');
 const product_component = require('./src/js/pages/Product');
 
@@ -68,6 +69,7 @@ const staticConfig = {
         // All pages under this site will share this entry, template, and reducers
         entry: 'main',
         template,
+        component: layout_component, // wrapper component that wraps each route component
         pages: [
             /**
              * Pages dictate what index.html's get created. Each page must have a matching
@@ -90,6 +92,7 @@ const staticConfig = {
     {
       entry: 'product',
       template,
+      component: layout_component,
       pages: [
         { route: '/*/menu/product', component: product_component},
       ],
@@ -127,7 +130,7 @@ const staticConfig = {
  * assets = {
  *  html: <rendered html page>,
  *  state: <state object>,
- *  app: <path to js file>,,=
+ *  app: <path to js file>,
  *  webpack: {<all assets generated during webpack bundling>}
  * }
  *
