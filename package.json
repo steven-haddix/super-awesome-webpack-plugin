@@ -29,7 +29,7 @@
     "url": "https://github.com/steven-haddix/super-awesome-webpack-plugin/issues"
   },
   "homepage": "https://github.com/steven-haddix/super-awesome-webpack-plugin#readme",
-  "devDependencies": {
+  "dependencies": {
     "babel-cli": "^6.18.0",
     "babel-core": "^6.18.2",
     "babel-plugin-istanbul": "^2.0.3",
