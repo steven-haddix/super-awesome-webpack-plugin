@@ -1,4 +1,6 @@
-[![Build Status](https://travis-ci.org/steven-haddix/super-awesome-webpack-plugin.svg?branch=master)](https://travis-ci.org/steven-haddix/super-awesome-webpack-plugin) [![Coverage Status](https://coveralls.io/repos/github/steven-haddix/super-awesome-webpack-plugin/badge.svg?branch=master)](https://coveralls.io/github/steven-haddix/super-awesome-webpack-plugin?branch=master)
+[![Build Status](https://travis-ci.org/steven-haddix/super-awesome-webpack-plugin.svg?branch=master)](https://travis-ci.org/steven-haddix/super-awesome-webpack-plugin)
+[![Coverage Status](https://coveralls.io/repos/github/steven-haddix/super-awesome-webpack-plugin/badge.svg?branch=master)](https://coveralls.io/github/steven-haddix/super-awesome-webpack-plugin?branch=master)
+[![dependencies Status](https://david-dm.org/steven-haddix/super-awesome-webpack-plugin/status.svg)](https://david-dm.org/steven-haddix/super-awesome-webpack-plugin)
 
 # Super Awesome Webpack Plugin
 A slightly opinionated Webpack plugin for generating static websites using React, React Router & Redux.
