@@ -8,7 +8,8 @@ import {
     es6Accessor,
     es6SafeCombineReducers,
     hasDefault,
-    trimStringRight
+    trimSplitLeft,
+    trimSplitRight
 } from '../src/helpers';
 
 
@@ -103,9 +104,17 @@ test('es6SafeCombineReducers', (t) => {
 })
 
 test('trimStringRight', (t) => {
-    t.equal(trimStringRight('part1/part2/part3', '/', 1), 'part1/part2', 'should remove 1 place from the right side')
-    t.equal(trimStringRight('part1/part2/part3', '/', 2), 'part1', 'should remove 2 places from the right side')
-    t.equal(trimStringRight('part1/part2/part3', '/', 3), '')
+    t.equal(trimSplitRight('part1/part2/part3', '/', 1), 'part1/part2', 'should remove 1 place from the right side')
+    t.equal(trimSplitRight('part1/part2/part3', '/', 2), 'part1', 'should remove 2 places from the right side')
+    t.equal(trimSplitRight('part1/part2/part3', '/', 3), '')
+
+    t.end();
+})
+
+test('trimSplitLeft', (t) => {
+    t.equal(trimSplitLeft('part1/part2/part3', '/', 1), 'part2/part3', 'should remove 1 place from the right side')
+    t.equal(trimSplitLeft('part1/part2/part3', '/', 2), 'part3', 'should remove 2 places from the right side')
+    t.equal(trimSplitLeft('part1/part2/part3', '/', 3), '')
 
     t.end();
 })

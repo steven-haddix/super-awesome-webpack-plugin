@@ -70,7 +70,7 @@ export function hasDefault(object) {
     return false;
 }
 
-export function trimStringRight(string, delimiter, places) {
+export function trimSplitRight(string, delimiter, places) {
     if (typeof string !== 'string') {
         return string;
     }
@@ -82,4 +82,18 @@ export function trimStringRight(string, delimiter, places) {
     }
 
     return parts.splice(0, parts.length - places).join('/');
+}
+
+export function trimSplitLeft(string, delimiter, places) {
+    if (typeof string !== 'string') {
+        return string;
+    }
+
+    const parts = string.split(delimiter);
+
+    if (parts === 0) {
+        return parts[0];
+    }
+
+    return parts.splice(places, parts.length - places).join('/');
 }

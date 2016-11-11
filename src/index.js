@@ -14,7 +14,8 @@ import {
     providerWrapper,
     es6Accessor,
     es6SafeCombineReducers,
-    trimStringRight
+    trimSplitRight,
+    trimSplitLeft
 } from './helpers'
 
 function SuperAwesomeWebpackPlugin(config) {
@@ -48,14 +49,14 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                     const routes = rootRoute(site.component, site.routes)
 
                     dataFiles.map((dataFile) => {
-                        const indexRoute = dataFile.replace('.json', '');
+                        const indexRoute = dataFile.replace(dataDir.replace('./', ''), '').replace('.json', '');
 
                         matchRoute(indexRoute, routes, (route) => {
                             if(!route) {
-                                throw new Error(`No matching route for file: ${indexRoute}`)
+                                return;
                             }
                             const state = require(path.resolve(dataFile));
-                            const appRoute = trimStringRight(dataFile, '/', 1);
+                            const appRoute = trimSplitRight(dataFile.replace(dataDir.replace('./', ''), ''), '/', 1);
                             const store = createStore(siteReducer, state);
                             const renderedPage = renderToString(
                                 providerWrapper(es6Accessor(route.component), store)
@@ -70,7 +71,7 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                             };
 
                             copyObjectProperty(compilation.assets, asset, `${appRoute}/${asset}`);
-                            copyObjectProperty(compilation.assets, `${asset}.map`, `${appRoute}${asset}.map`);
+                            copyObjectProperty(compilation.assets, `${asset}.map`, `${appRoute}/${asset}.map`);
                             appRoutes.push(`${appRoute}/${asset}`);
 
                             compilation.assets[path.join(indexRoute, 'index.html')] = new RawSource(template(indexAssets));

@@ -33,7 +33,7 @@ test('should handle configuration files properly', (t) => {
                 routes: [
                     { path: '/*/fake1', component: component },
                     { path: '/*/fake2', component: component },
-                    { path: '/**/fake', component: component }
+                    { path: '/fake', component: component }
 
                 ],
                 reducers: { content: function() {
@@ -96,8 +96,8 @@ test('should handle configuration files properly', (t) => {
                         if(event === 'optimize-assets') {
                             callback({}, () => {
                                 t.deepEqual(assets,  {
-                                    'tests/fakeDirectory/fake/index.html': {
-                                        app: 'tests/fakeDirectory/main.js',
+                                    '/fake/index.html': {
+                                        app: '/main.js',
                                         html: '',
                                         manifest: 'manifest.js',
                                         state: {
@@ -106,8 +106,8 @@ test('should handle configuration files properly', (t) => {
                                         style: 'style.css',
                                         vendor: 'vendor.js'
                                     },
-                                    'tests/fakeDirectory/fakeSubDirectory/fake1/index.html': {
-                                        app: 'tests/fakeDirectory/fakeSubDirectory/main.js',
+                                    '/fakeSubDirectory/fake1/index.html': {
+                                        app: '/fakeSubDirectory/main.js',
                                         html: '',
                                         manifest: 'manifest.js',
                                         state: {
@@ -116,8 +116,8 @@ test('should handle configuration files properly', (t) => {
                                         style: 'style.css',
                                         vendor: 'vendor.js'
                                     },
-                                    'tests/fakeDirectory/fakeSubDirectory/fake2/index.html': {
-                                        app: 'tests/fakeDirectory/fakeSubDirectory/main.js',
+                                    '/fakeSubDirectory/fake2/index.html': {
+                                        app: '/fakeSubDirectory/main.js',
                                         html: '',
                                         manifest: 'manifest.js',
                                         state: {
