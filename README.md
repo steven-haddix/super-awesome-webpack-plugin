@@ -94,7 +94,7 @@ const staticConfig = {
       template,
       component: layout_component,
       pages: [
-        { route: '/*/menu/product', component: product_component},
+        { route: '/*/menu/product/*', component: product_component},
       ],
       reducers: { product: product_reducer, content: content_reducer }
     }
