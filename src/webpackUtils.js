@@ -1,3 +1,7 @@
+import path from 'path';
+import webpack from 'webpack';
+import CleanWebpackPlugin from 'clean-webpack-plugin';
+
 // Shamelessly stolen from html-webpack-plugin - Thanks @ampedandwired :)
 export function getAssetsFromCompilation(compilation, webpackStatsJson) {
     var assets = {};
@@ -37,4 +41,49 @@ export function findAssetName(src, compilation, webpackStatsJson) {
         chunkValue = chunkValue[0];
     }
     return chunkValue;
+}
+
+const baseConfiguration = {
+    entry: {},
+    target: 'node',
+    output: {
+        path: path.join(process.cwd(), './.super_awesome/build'),
+        filename: '[name].js',
+        libraryTarget: 'commonjs2'
+    },
+    resolve: {
+        extensions: ['', '.js', '.jsx'],
+        modulesDirectories: ['src', 'node_modules']
+    },
+    module: {
+        loaders: [
+            { test: /\.js$/, loader: 'babel', exclude: /(node_modules|\.super_awesome)/, query: { compact: false } },
+        ]
+    },
+    plugins: [
+        new CleanWebpackPlugin([path.join(process.cwd(), './.super_awesome/build')], {
+            root: process.cwd()
+        })
+    ]
+};
+
+export function generateConfiguration(entries) {
+    if(!entries || !Array.isArray(entries)) {
+        return false;
+    }
+    const config = Object.assign({}, baseConfiguration);
+
+    entries.forEach((entry) => {
+        config.entry[entry.key] = entry.file;
+    })
+
+    return config;
+}
+
+export function compileConfiguration(config) {
+    return new Promise((resolve) => {
+        webpack(config, function(err, stats) {
+            resolve(err, stats);
+        });
+    })
 }

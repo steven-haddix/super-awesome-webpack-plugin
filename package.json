@@ -11,7 +11,7 @@
     "build": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
     "build:publish": "npm run build && npm version patch && npm publish",
     "cover": "nyc report --reporter=lcov --reporter=text-lcov | coveralls",
-    "test": "cross-env NODE_ENV=test nyc babel-tape-runner tests/**/*.test.js | tap-spec"
+    "test": "cross-env NODE_ENV=test nyc tape tests/**/*.test.js | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -38,8 +38,10 @@
     "babel-register": "^6.18.0",
     "babel-tape-runner": "^2.0.1",
     "blue-tape": "^1.0.0",
+    "clean-webpack-plugin": "^0.1.14",
     "coveralls": "^2.11.14",
     "cross-env": "^3.1.3",
+    "node-uuid": "^1.4.7",
     "nyc": "^8.4.0",
     "proxyquire": "^1.7.10",
     "react": "^15.3.2",
@@ -64,5 +66,8 @@
     ],
     "sourceMap": false,
     "instrument": false
+  },
+  "devDependencies": {
+    "babel-loader": "^6.2.7"
   }
 }

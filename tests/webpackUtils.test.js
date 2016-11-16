@@ -1,5 +1,19 @@
 import test from 'blue-tape';
-import { findAssetName, getAssetsFromCompilation } from '../src/webpackUtils';
+import path from 'path';
+import React from 'react'
+import uuid from 'node-uuid';
+import { renderToString } from 'react-dom/server'
+
+import {
+    findAssetName,
+    getAssetsFromCompilation,
+    generateConfiguration,
+    compileConfiguration
+} from '../src/webpackUtils';
+
+import {
+    hashText
+} from '../src/helpers';
 
 test('getAssetsFromCompilation', (t) => {
     const compilation1 = {
@@ -68,3 +82,38 @@ test('findAssetName', (t) => {
 
     t.end()
 })
+
+test('compileConfiguration', (t) => new Promise((resolve, reject) => {
+    const simpleEntry = uuid.v4();
+    const complexEntry = uuid.v4();
+    const ce = uuid.v4();
+
+    const SimpleComponent = require('./stubs/Component.stub.js');
+    const functionComponent = require('./stubs/Component.stub.js');
+    const sc = generateConfiguration(ce, './tests/stubs/Component.stub.js');
+
+    const config = generateConfiguration([
+        { key: simpleEntry, file: './tests/stubs/Component.stub.js' },
+        { key: ce, file: './tests/stubs/ModulesExportComponent.js' },
+        { key: complexEntry, file: './tests/stubs/ComplexComponent.js' }
+    ]);
+
+    compileConfiguration(config).then((err, stats) => {
+        if(err) {
+            console.log(err);
+        }
+
+        const SimpleComponenetRendered = require(path.join(process.cwd(), `.super_awesome/build/${simpleEntry}.js`))
+        t.equal(renderToString(<SimpleComponenetRendered.default />), renderToString(<SimpleComponent.default />), 'should render simple components')
+
+        const functionComponent2 = renderToString(<functionComponent/>);
+        const functionComponent = require(path.join(process.cwd(), `.super_awesome/build/${ce}.js`))
+        t.equal(renderToString(<functionComponent />), functionComponent2, 'should render simple components')
+
+        const ComplexComponentRendered = require(path.join(process.cwd(), `.super_awesome/build/${complexEntry}.js`))
+        t.ok(renderToString(<ComplexComponentRendered.default />), 'should render complex webpack components')
+
+        resolve()
+    }).catch((err) => console.log(err));
+}).catch((err) => console.log(err)))
+
