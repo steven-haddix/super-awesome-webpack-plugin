@@ -1,4 +1,6 @@
 // Needed in case the configuration requires non-babel'd files
+require('babel-register')
+
 import path from 'path';
 const RawSource = require('webpack-sources/lib/RawSource');
 import { renderToString } from 'react-dom/server'
