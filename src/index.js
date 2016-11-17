@@ -51,7 +51,7 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                         dataFiles.map((dataFile) => {
                             const indexRoute = dataFile.replace(dataDir.replace('./', ''), '').replace('.json', '');
                             const state = require(path.resolve(dataFile));
-                            const appRoute = generateAppRoute(dataDir);
+                            const appRoute = generateAppRoute(dataFile, dataDir);
 
                             matchRoute(indexRoute, routes, (route) => {
                                 if(!route) {
@@ -67,6 +67,7 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                                     webpack: assets
                                 });
 
+                                // TODO: Need to fix so assets are placed at minimum file directory
                                 copyObjectProperty(compilation.assets, asset, app);
                                 copyObjectProperty(compilation.assets, `${asset}.map`, `${app}.map`);
                                 appRoutes.push(app);
@@ -126,8 +127,8 @@ SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
         })
 };
 
-function generateAppRoute(dir) {
-    return trimSplitRight(dir.replace(dir.replace('./', ''), ''), '/', 1);
+function generateAppRoute(file, base) {
+    return trimSplitRight(file.replace(base.replace('./', ''), ''), '/', 1);
 }
 
 function renderPage(component, reducer,  state) {

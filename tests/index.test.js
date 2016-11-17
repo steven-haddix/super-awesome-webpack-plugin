@@ -90,7 +90,7 @@ test('should handle configuration files properly', (t) => {
                             callback({}, () => {
                                 t.deepEqual(assets,  {
                                     '/fake/index.html': {
-                                        app: './main.js',
+                                        app: '/main.js',
                                         html: '',
                                         manifest: 'manifest.js',
                                         state: {
@@ -100,7 +100,7 @@ test('should handle configuration files properly', (t) => {
                                         vendor: 'vendor.js'
                                     },
                                     '/fakeSubDirectory/fake1/index.html': {
-                                        app: './main.js',
+                                        app: '/fakeSubDirectory/main.js',
                                         html: '',
                                         manifest: 'manifest.js',
                                         state: {
@@ -110,7 +110,7 @@ test('should handle configuration files properly', (t) => {
                                         vendor: 'vendor.js'
                                     },
                                     '/fakeSubDirectory/fake2/index.html': {
-                                        app: './main.js',
+                                        app: '/fakeSubDirectory/main.js',
                                         html: '',
                                         manifest: 'manifest.js',
                                         state: {
