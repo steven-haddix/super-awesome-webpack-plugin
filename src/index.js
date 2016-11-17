@@ -5,6 +5,7 @@ import path from 'path';
 const RawSource = require('webpack-sources/lib/RawSource');
 import { renderToString } from 'react-dom/server'
 import { createStore } from 'redux';
+import _ from 'lodash'
 
 import { rootRoute, matchRoute } from './routingUtils'
 import { walkSync } from './fileUtils'
@@ -94,7 +95,7 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
 };
 
 SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
-    const siteCopy = Object.assign({}, site);
+    const siteCopy = _.cloneDeep(site);
     const uuid = require('node-uuid');
     const rootUUID = uuid.v4();
     const rootEntry = generateConfiguration([{ key: rootUUID, file: site.component, path: '/'}])

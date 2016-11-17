@@ -1,6 +1,7 @@
 import path from 'path';
 import webpack from 'webpack';
 import CleanWebpackPlugin from 'clean-webpack-plugin';
+import _ from 'lodash'
 
 // Shamelessly stolen from html-webpack-plugin - Thanks @ampedandwired :)
 export function getAssetsFromCompilation(compilation, webpackStatsJson) {
@@ -71,7 +72,7 @@ export function generateConfiguration(entries) {
     if(!entries || !Array.isArray(entries)) {
         return false;
     }
-    const config = Object.assign({}, baseConfiguration);
+    const config = _.cloneDeep(baseConfiguration);
 
     entries.forEach((entry) => {
         config.entry[entry.key] = entry.file;
