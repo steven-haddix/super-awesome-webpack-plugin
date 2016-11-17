@@ -47,8 +47,8 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                     const reducer = es6SafeCombineReducers(site.reducers);
                     const template = es6Accessor(site.template);
 
-                    return self.resolveConfigComponents(site).then(() => {
-                        const routes = rootRoute(site.component, site.routes)
+                    return self.resolveConfigComponents(site).then((siteFixed) => {
+                        const routes = rootRoute(siteFixed.component, siteFixed.routes)
 
                         dataFiles.map((dataFile) => {
                             const indexRoute = dataFile.replace(dataDir.replace('./', ''), '').replace('.json', '');
@@ -94,6 +94,7 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
 };
 
 SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
+    const siteCopy = Object.assign({}, site);
     const uuid = require('node-uuid');
     const rootUUID = uuid.v4();
     const rootEntry = generateConfiguration([{ key: rootUUID, file: site.component, path: '/'}])
@@ -123,7 +124,7 @@ SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
                         })
                     });
 
-                    resolve();
+                    resolve(siteCopy);
                 })
             })
         })
