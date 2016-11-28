@@ -98,7 +98,7 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
 };
 
 SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
-    const uuid = require('node-uuid');
+    const uuid = require('uuid');
     const rootUUID = uuid.v4();
 
     const rootEntry = generateConfiguration([{ key: rootUUID, file: site.component, path: '/'}])

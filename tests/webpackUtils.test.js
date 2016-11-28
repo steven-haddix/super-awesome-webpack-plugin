@@ -1,7 +1,7 @@
 import test from 'blue-tape';
 import path from 'path';
 import React from 'react'
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 import { renderToString } from 'react-dom/server'
 
 import {
