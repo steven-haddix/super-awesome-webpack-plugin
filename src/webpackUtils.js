@@ -2,6 +2,7 @@ import path from 'path';
 import webpack from 'webpack';
 import CleanWebpackPlugin from 'clean-webpack-plugin';
 import _ from 'lodash'
+import merge from 'webpack-merge'
 
 // Shamelessly stolen from html-webpack-plugin - Thanks @ampedandwired :)
 export function getAssetsFromCompilation(compilation, webpackStatsJson) {
@@ -58,7 +59,7 @@ const baseConfiguration = {
     },
     module: {
         loaders: [
-            { test: /\.js$/, loader: 'babel', exclude: /(node_modules|\.super_awesome)/, query: { compact: false } },
+            { test: /\.js$/, loader: 'babel?compact=false', exclude: /(node_modules|\.super_awesome)/, query: { compact: false } },
         ]
     },
     plugins: [
@@ -68,11 +69,16 @@ const baseConfiguration = {
     ]
 };
 
-export function generateConfiguration(entries) {
-    if(!entries || !Array.isArray(entries)) {
-        return false;
+export function generateConfiguration(entries = [], configuration = {}) {
+    if (typeof configuration !== 'object') {
+        throw new Error('Invalid webpack configuration passed to plugin. Must be an object.')
     }
-    const config = _.cloneDeep(baseConfiguration);
+
+    const config = merge({}, _.cloneDeep(baseConfiguration), _.cloneDeep(configuration));
+
+    if (!Array.isArray(entries)) {
+        throw new Error('Invalid list of entries passed to static configuration generator. Likely caused by an invalid site configuration.')
+    }
 
     entries.forEach((entry) => {
         config.entry[entry.key] = entry.file;

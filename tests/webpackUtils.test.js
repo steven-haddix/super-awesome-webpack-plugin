@@ -11,10 +11,6 @@ import {
     compileConfiguration
 } from '../src/webpackUtils';
 
-import {
-    hashText
-} from '../src/helpers';
-
 test('getAssetsFromCompilation', (t) => {
     const compilation1 = {
         options: {
@@ -90,7 +86,6 @@ test('compileConfiguration', (t) => new Promise((resolve, reject) => {
 
     const SimpleComponent = require('./stubs/Component.stub.js');
     const functionComponent = require('./stubs/Component.stub.js');
-    const sc = generateConfiguration(ce, './tests/stubs/Component.stub.js');
 
     const config = generateConfiguration([
         { key: simpleEntry, file: './tests/stubs/Component.stub.js' },
@@ -117,3 +112,23 @@ test('compileConfiguration', (t) => new Promise((resolve, reject) => {
     }).catch((err) => console.log(err));
 }).catch((err) => console.log(err)))
 
+test('generateConfiguration', (t) => {
+    const entries = [
+        { key: 'key1', file: 'file1'},
+        { key: 'key2', file: 'file2'}
+    ];
+
+    const configuration = {
+        module: {
+            loaders: [
+                { test: /\.js$/, loader: 'someLoader' }
+            ]
+        }
+    }
+
+    const generatedConfig = generateConfiguration(entries, configuration);
+
+    t.deepEqual(generatedConfig.entry, { key1: 'file1', key2: 'file2' }, 'should add entries to configuration');
+    t.equal(generatedConfig.module.loaders[1].loader, 'someLoader', 'should merge additional configurations with base configuration');
+    t.end()
+})

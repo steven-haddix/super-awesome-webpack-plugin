@@ -5,7 +5,7 @@ import path from 'path';
 const RawSource = require('webpack-sources/lib/RawSource');
 import { renderToString } from 'react-dom/server'
 import { createStore } from 'redux';
-import _ from 'lodash'
+import lodash from 'lodash';
 
 import { rootRoute, matchRoute } from './routingUtils'
 import { walkSync } from './fileUtils'
@@ -18,8 +18,9 @@ import {
     trimSplitRight
 } from './helpers'
 
-function SuperAwesomeWebpackPlugin(config) {
+function SuperAwesomeWebpackPlugin(config, staticWebpackConfig = {}) {
     this.config = config;
+    this.staticWebpackConfig = staticWebpackConfig;
 }
 
 SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
@@ -48,7 +49,7 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                     const reducer = es6SafeCombineReducers(site.reducers);
                     const template = es6Accessor(site.template);
 
-                    return self.resolveConfigComponents(site).then((siteFixed) => {
+                    return self.resolveConfigComponents(lodash.cloneDeep(site)).then((siteFixed) => {
                         const routes = rootRoute(siteFixed.component, siteFixed.routes)
 
                         dataFiles.map((dataFile) => {
@@ -85,7 +86,9 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                     })
                 })
 
-                Promise.all(sitePromises).then(() => done())
+                Promise.all(sitePromises)
+                    .then(() => done())
+                    .catch((err) => console.log(err))
             } catch (err) {
                 compilation.errors.push(err.stack);
                 done();
@@ -95,26 +98,29 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
 };
 
 SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
-    const siteCopy = _.cloneDeep(site);
     const uuid = require('node-uuid');
     const rootUUID = uuid.v4();
+
     const rootEntry = generateConfiguration([{ key: rootUUID, file: site.component, path: '/'}])
 
-    return compileConfiguration(rootEntry)
+    return compileConfiguration(rootEntry, this.staticWebpackConfig)
         .then(() => {
             return new Promise((resolve) => {
+
                 const component = require(path.join(process.cwd(), `.super_awesome/build/${rootUUID}.js`))
                 site.component = es6Accessor(component);
+
                 resolve()
-            })
+            }).catch((err) => console.log(err));
         }).then(() => {
             const entries = [];
+
             site.routes.forEach((route) => {
                 entries.push({ key: uuid.v4(), file: route.component, path: route.path })
             });
 
             const entriesConfig = generateConfiguration(entries);
-            return compileConfiguration(entriesConfig).then(() => {
+            return compileConfiguration(entriesConfig, this.staticWebpackConfig).then(() => {
                 return new Promise((resolve) => {
                     entries.forEach((entry) => {
                         site.routes.forEach((route) => {
@@ -125,8 +131,8 @@ SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
                         })
                     });
 
-                    resolve(siteCopy);
-                })
+                    resolve(site);
+                }).catch((err) => console.log(err))
             })
         })
 };
