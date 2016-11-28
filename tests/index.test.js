@@ -1,25 +1,18 @@
 import test from 'tape';
+import blueTape from 'blue-tape';
 import React from 'react'
 var proxyquire = require('proxyquire');
 
+
 // TODO: Refactor to be more modular and have better acceptance criteria
 test('should handle configuration files properly', (t) => {
-    const component = class Product extends React.Component {
-        constructor() {
-            super();
-        }
-
-        render() {
-            return <div></div>
-        }
-    }
 
     const staticConfig = {
         dataDir: './tests/fakeDirectory',
         sites: [
             {
                 entry: 'main',
-                component: component,
+                component: './tests/stubs/Component.stub.js',
                 template: function(assets) {
                     return {
                         html: '',
@@ -31,9 +24,9 @@ test('should handle configuration files properly', (t) => {
                     }
                 },
                 routes: [
-                    { path: '/*/fake1', component: component },
-                    { path: '/*/fake2', component: component },
-                    { path: '/fake', component: component }
+                    { path: '/*/fake1', component: './tests/stubs/Component.stub.js' },
+                    { path: '/*/fake2', component: './tests/stubs/Component.stub.js' },
+                    { path: '/fake', component: './tests/stubs/Component.stub.js' }
 
                 ],
                 reducers: { content: function() {
@@ -146,3 +139,23 @@ test('should handle configuration files properly', (t) => {
         }
     })
 })
+
+blueTape('resolveConfigComponents', (t) => new Promise((resolve) => {
+    const siteConfig = {
+        component: './tests/stubs/Component.stub.js',
+        routes: [
+            { path: '/*/fake1', component: './tests/stubs/Component.stub.js' },
+            { path: '/*/fake2', component: './tests/stubs/Component.stub.js' },
+            { path: '/fake', component: './tests/stubs/Component.stub.js' }
+        ]
+    };
+
+    const superAwesome = new (require('../src/index'))()
+    superAwesome.resolveConfigComponents(siteConfig).then(() => {
+        t.ok(siteConfig, 'should update site config with webpack components')
+        resolve()
+    }).catch((err) => {
+        console.log(err)
+        resolve()
+    })
+}))

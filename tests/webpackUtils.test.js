@@ -1,5 +1,15 @@
 import test from 'blue-tape';
-import { findAssetName, getAssetsFromCompilation } from '../src/webpackUtils';
+import path from 'path';
+import React from 'react'
+import uuid from 'uuid';
+import { renderToString } from 'react-dom/server'
+
+import {
+    findAssetName,
+    getAssetsFromCompilation,
+    generateConfiguration,
+    compileConfiguration
+} from '../src/webpackUtils';
 
 test('getAssetsFromCompilation', (t) => {
     const compilation1 = {
@@ -66,5 +76,59 @@ test('findAssetName', (t) => {
 
     t.equal(findAssetName('main', compilation2, webpackStatsJson2), null, 'should return null if not compilation asset or chunk name is found');
 
+    t.end()
+})
+
+test('compileConfiguration', (t) => new Promise((resolve, reject) => {
+    const simpleEntry = uuid.v4();
+    const complexEntry = uuid.v4();
+    const ce = uuid.v4();
+
+    const SimpleComponent = require('./stubs/Component.stub.js');
+    const functionComponent = require('./stubs/Component.stub.js');
+
+    const config = generateConfiguration([
+        { key: simpleEntry, file: './tests/stubs/Component.stub.js' },
+        { key: ce, file: './tests/stubs/ModulesExportComponent.js' },
+        { key: complexEntry, file: './tests/stubs/ComplexComponent.js' }
+    ]);
+
+    compileConfiguration(config).then((err, stats) => {
+        if(err) {
+            console.log(err);
+        }
+
+        const SimpleComponenetRendered = require(path.join(process.cwd(), `.super_awesome/build/${simpleEntry}.js`))
+        t.equal(renderToString(<SimpleComponenetRendered.default />), renderToString(<SimpleComponent.default />), 'should render simple components')
+
+        const functionComponent2 = renderToString(<functionComponent/>);
+        const functionComponent = require(path.join(process.cwd(), `.super_awesome/build/${ce}.js`))
+        t.equal(renderToString(<functionComponent />), functionComponent2, 'should render simple components')
+
+        const ComplexComponentRendered = require(path.join(process.cwd(), `.super_awesome/build/${complexEntry}.js`))
+        t.ok(renderToString(<ComplexComponentRendered.default />), 'should render complex webpack components')
+
+        resolve()
+    }).catch((err) => console.log(err));
+}).catch((err) => console.log(err)))
+
+test('generateConfiguration', (t) => {
+    const entries = [
+        { key: 'key1', file: 'file1'},
+        { key: 'key2', file: 'file2'}
+    ];
+
+    const configuration = {
+        module: {
+            loaders: [
+                { test: /\.js$/, loader: 'someLoader' }
+            ]
+        }
+    }
+
+    const generatedConfig = generateConfiguration(entries, configuration);
+
+    t.deepEqual(generatedConfig.entry, { key1: 'file1', key2: 'file2' }, 'should add entries to configuration');
+    t.equal(generatedConfig.module.loaders[1].loader, 'someLoader', 'should merge additional configurations with base configuration');
     t.end()
 })
