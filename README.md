@@ -32,7 +32,8 @@ entry: {
     vendor: Object.keys(require('./package.json').dependencies)
 }
 ```
-New up the plugin and add it to the plugin array
+New up the plugin and add it to the plugin array. The first parameter is the site configuration and the second parameter
+takes a webpack configuration object (everything in the site configuration is ran through webpack).
 ```javascript
 
 plugins: [
@@ -42,7 +43,7 @@ plugins: [
         names: ['vendor', 'manifest'],
         minChunks: Infinity
     })
-    new SuperAwesomeWebpackPlugin(buildConfig)
+    new SuperAwesomeWebpackPlugin(buildConfig, {})
 ]
 ```
 ## Example Configuration
@@ -54,15 +55,9 @@ plugins: [
  */
 const template = require('./template');
 
-// Components
-const layout_component = require('./src/js/pages/Layout');
-const home_component = require('./src/js/pages/Home');
-const product_component = require('./src/js/pages/Product');
-
 // Reducers
 const product_reducer = require('./src/js/redux/reducers/product');
 const content_reducer = require('./src/js/redux/reducers/content');
-
 
 const staticConfig = {
   dataDir: './data',
@@ -71,7 +66,7 @@ const staticConfig = {
         // All pages under this site will share this entry, template, and reducers
         entry: 'main',
         template,
-        component: layout_component, // wrapper component that wraps each route component
+        component: './src/js/components/pages/Wrapper', // wrapper component that wraps each route component
         pages: [
             /**
              * Pages dictate what index.html's get created. Each page must have a matching
@@ -86,8 +81,8 @@ const staticConfig = {
              * - /en_US/explore/index.html
              * - /es_US/explore/index.html
              */
-            { route: '/*/home', component: home_component },
-            { route: '/*/explore', component: explore_component }
+            { route: '/*/home', component: './src/js/components/pages/Home' },
+            { route: '/*/explore', component: './src/js/components/pages/Explore' }
         ],
         reducers: { content: content_reducer }
     },
@@ -96,7 +91,7 @@ const staticConfig = {
       template,
       component: layout_component,
       pages: [
-        { route: '/*/menu/product/*', component: product_component},
+        { route: '/*/menu/product/*', component: './src/js/components/pages/Product'},
       ],
       reducers: { product: product_reducer, content: content_reducer }
     }
@@ -107,19 +102,15 @@ const staticConfig = {
 ```javascript
 /data
     /en_US
-        /home
-            home.json // /en_US/home/index.html
-        /explore
-            explore.json // /en_US/explore/index.html
+        home.json // /en_US/home/index.html
+        explore.json // /en_US/explore/index.html
         /products
             product_1.json // /en_US/products/product_1/index.html
             product_2.json // /en_US/products/product_2/index.html
             product_3.json // /en_US/products/product_3/index.html
     /en_US
-        /home
-            home.json // /es_US/home/index.html
-        /explore
-            explore.json // /es_US/explore/index.html
+        home.json // /es_US/home/index.html
+        explore.json // /es_US/explore/index.html
         /products
             product_1.json // /es_US/products/product_1/index.html
             product_2.json // /es_US/products/product_2/index.html
