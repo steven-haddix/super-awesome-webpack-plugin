@@ -5,6 +5,9 @@
 # Super Awesome Webpack Plugin
 A slightly opinionated Webpack plugin for generating static websites using React, React Router & Redux.
 
+## Requirements
+Currently only tested on node v6.3.1
+
 ## Install
 ```bash
 npm install --save-dev super-awesome-webpack-plugin
@@ -171,3 +174,4 @@ export default function (assets) {
 - ~~Support localization in builder functions to reduce configuration noise (Partially complete)~~
 - Validation around configuration (Partially complete)
 - ~~Remove multiPage flag in favor of a better architecture~~
+# super-awesome-webpack-plugin-example-site

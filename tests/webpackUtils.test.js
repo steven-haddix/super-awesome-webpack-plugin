@@ -105,6 +105,7 @@ test.only('compileConfiguration', (t) => new Promise((resolve, reject) => {
             ]
         }
     })
+
     compileConfiguration(config).then((err, stats) => {
         if(err) {
             console.log(err);
