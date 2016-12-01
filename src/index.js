@@ -51,6 +51,7 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
 
                     return self.resolveConfigComponents(lodash.cloneDeep(site)).then((siteFixed) => {
                         const routes = rootRoute(siteFixed.component, siteFixed.routes)
+                        console.log(siteFixed)
 
                         dataFiles.map((dataFile) => {
                             const indexRoute = dataFile.replace(dataDir.replace('./', ''), '').replace('.json', '');
@@ -150,6 +151,7 @@ function renderPage(component, reducer,  state) {
 
 function cleanUpAsset(appRoutes, asset, compilation) {
     // Clean up unused assets that have been copied to other routes
+    console.log(appRoutes)
     if(!appRoutes.includes(asset)) {
         delete compilation.assets[asset];
         delete compilation.assets[`${asset}.map`];
