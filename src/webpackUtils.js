@@ -88,7 +88,6 @@ export function generateConfiguration(entries = [], configuration = {}) {
 }
 
 export function compileConfiguration(config) {
-    console.log(config.module.loaders)
     return new Promise((resolve) => {
         webpack(config, function(err, stats) {
             resolve(err, stats);
