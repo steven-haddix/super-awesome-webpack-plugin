@@ -174,3 +174,4 @@ export default function (assets) {
 - ~~Support localization in builder functions to reduce configuration noise (Partially complete)~~
 - Validation around configuration (Partially complete)
 - ~~Remove multiPage flag in favor of a better architecture~~
+# super-awesome-webpack-plugin-example-site
