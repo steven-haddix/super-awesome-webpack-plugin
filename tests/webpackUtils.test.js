@@ -91,7 +91,13 @@ test('compileConfiguration', (t) => new Promise((resolve, reject) => {
         { key: simpleEntry, file: './tests/stubs/Component.stub.js' },
         { key: ce, file: './tests/stubs/ModulesExportComponent.js' },
         { key: complexEntry, file: './tests/stubs/ComplexComponent.js' }
-    ]);
+    ], {
+        module: {
+            loaders: [
+                { test: /\.css/, loaders: ['isomorphic-style','css'] }
+            ]
+        }
+    });
 
     compileConfiguration(config).then((err, stats) => {
         if(err) {

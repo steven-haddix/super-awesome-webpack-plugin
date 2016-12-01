@@ -5,7 +5,7 @@ var proxyquire = require('proxyquire');
 
 
 // TODO: Refactor to be more modular and have better acceptance criteria
-test.only('should handle configuration files properly', (t) => {
+test('should handle configuration files properly', (t) => {
 
     const staticConfig = {
         dataDir: './tests/fakeDirectory',
