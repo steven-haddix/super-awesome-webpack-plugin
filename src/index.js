@@ -101,9 +101,9 @@ SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
     const uuid = require('uuid');
     const rootUUID = uuid.v4();
 
-    const rootEntry = generateConfiguration([{ key: rootUUID, file: site.component, path: '/'}])
+    const rootEntry = generateConfiguration([{ key: rootUUID, file: site.component, path: '/'}], this.staticWebpackConfig)
 
-    return compileConfiguration(rootEntry, this.staticWebpackConfig)
+    return compileConfiguration(rootEntry)
         .then(() => {
             return new Promise((resolve) => {
 
@@ -119,8 +119,8 @@ SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
                 entries.push({ key: uuid.v4(), file: route.component, path: route.path })
             });
 
-            const entriesConfig = generateConfiguration(entries);
-            return compileConfiguration(entriesConfig, this.staticWebpackConfig).then(() => {
+            const entriesConfig = generateConfiguration(entries, this.staticWebpackConfig);
+            return compileConfiguration(entriesConfig).then(() => {
                 return new Promise((resolve) => {
                     entries.forEach((entry) => {
                         site.routes.forEach((route) => {

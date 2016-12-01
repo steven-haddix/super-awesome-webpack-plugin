@@ -79,7 +79,7 @@ test('findAssetName', (t) => {
     t.end()
 })
 
-test('compileConfiguration', (t) => new Promise((resolve, reject) => {
+test.only('compileConfiguration', (t) => new Promise((resolve, reject) => {
     const simpleEntry = uuid.v4();
     const complexEntry = uuid.v4();
     const ce = uuid.v4();
@@ -91,8 +91,20 @@ test('compileConfiguration', (t) => new Promise((resolve, reject) => {
         { key: simpleEntry, file: './tests/stubs/Component.stub.js' },
         { key: ce, file: './tests/stubs/ModulesExportComponent.js' },
         { key: complexEntry, file: './tests/stubs/ComplexComponent.js' }
-    ]);
-
+    ], {
+        module: {
+            loaders: [
+                {
+                    test: /\.css$/,
+                    loaders: ["isomorphic-style", "css"]
+                },
+                {
+                    test: /\.scss$/,
+                    loaders: ["isomorphic-style", "css", "sass"]
+                }
+            ]
+        }
+    })
     compileConfiguration(config).then((err, stats) => {
         if(err) {
             console.log(err);

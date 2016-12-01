@@ -54,7 +54,7 @@ const baseConfiguration = {
         libraryTarget: 'commonjs2'
     },
     resolve: {
-        extensions: ['', '.js', '.jsx'],
+        extensions: ['', '.js'],
         modulesDirectories: ['src', 'node_modules']
     },
     module: {
@@ -88,6 +88,7 @@ export function generateConfiguration(entries = [], configuration = {}) {
 }
 
 export function compileConfiguration(config) {
+    console.log(config.module.loaders)
     return new Promise((resolve) => {
         webpack(config, function(err, stats) {
             resolve(err, stats);
