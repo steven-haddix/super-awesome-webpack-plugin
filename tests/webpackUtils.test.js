@@ -79,7 +79,7 @@ test('findAssetName', (t) => {
     t.end()
 })
 
-test('compileConfiguration', (t) => new Promise((resolve, reject) => {
+test.only('compileConfiguration', (t) => new Promise((resolve, reject) => {
     const simpleEntry = uuid.v4();
     const complexEntry = uuid.v4();
     const ce = uuid.v4();
@@ -94,10 +94,17 @@ test('compileConfiguration', (t) => new Promise((resolve, reject) => {
     ], {
         module: {
             loaders: [
-                { test: /\.css/, loaders: ['isomorphic-style','css'] }
+                {
+                    test: /\.css$/,
+                    loaders: ["isomorphic-style", "css"]
+                },
+                {
+                    test: /\.scss$/,
+                    loaders: ["isomorphic-style", "css", "sass"]
+                }
             ]
         }
-    });
+    })
 
     compileConfiguration(config).then((err, stats) => {
         if(err) {
