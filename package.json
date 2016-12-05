@@ -67,7 +67,7 @@
     "babel-tape-runner": "^2.0.1",
     "blue-tape": "^1.0.0",
     "coveralls": "^2.11.14",
-    "css-loader": "^0.26.0",
+    "css-loader": "^0.26.1",
     "file-loader": "^0.9.0",
     "isomorphic-style-loader": "^1.1.0",
     "node-sass": "^3.13.0",

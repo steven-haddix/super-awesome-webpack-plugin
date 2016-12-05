@@ -94,14 +94,8 @@ test('compileConfiguration', (t) => new Promise((resolve, reject) => {
     ], {
         module: {
             loaders: [
-                {
-                    test: /\.css$/,
-                    loaders: ["isomorphic-style", "css"]
-                },
-                {
-                    test: /\.scss$/,
-                    loaders: ["isomorphic-style", "css", "sass"]
-                }
+                { test: /\.css$/, loaders: ['isomorphic-style', 'css'] },
+                { test: /\.scss$/, loaders: ['isomorphic-style', 'css', 'sass']}
             ]
         }
     })
