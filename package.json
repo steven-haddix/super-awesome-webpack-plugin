@@ -1,7 +1,7 @@
 {
   "name": "super-awesome-webpack-plugin",
   "title": "Super Awesome Webpack Plugin",
-  "version": "2.0.11",
+  "version": "2.0.12",
   "description": "A slightly opinionated Webpack plugin for generating static websites using React, React Router, and Redux.",
   "main": "lib/index.js",
   "files": [
@@ -11,11 +11,12 @@
     "build": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
     "build:publish": "npm run build && npm version patch && npm publish",
     "cover": "nyc report --reporter=lcov --reporter=text-lcov | coveralls",
-    "test": "cross-env NODE_ENV=test nyc tape tests/**/*.test.js | tap-spec"
+    "test": "cross-env NODE_ENV=test nyc tape tests/**/*.test.js | tap-spec",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/steven-haddix/super-awesome-webpack-plugin.git"
+    "url": "https://github.com/steven-haddix/super-awesome-webpack-plugin.git"
   },
   "keywords": [
     "Static Website Generaton",
@@ -74,6 +75,7 @@
     "nyc": "^8.4.0",
     "proxyquire": "^1.7.10",
     "sass-loader": "^4.0.2",
+    "semantic-release": "^6.3.2",
     "style-loader": "^0.13.1",
     "tap-spec": "^4.1.1",
     "tape": "^4.6.2",
