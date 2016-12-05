@@ -32,17 +32,14 @@ blueTape('matchRoute', (t) => new Promise(resolve => {
             '/',
             Component,
             [
-                createRoute('/**/product/*', Component),
+                createRoute('/**/product/*', Component.default),
                 createRoute('/**/test', Component)
             ]
         )]
     };
 
     const match = matchRoute('/en_US/product/product1', routes, (match) => {
-        t.deepEqual({
-            path: '/**/product/*',
-            component: Component
-        }, match, 'should return a matching route dynamically');
+        t.deepEqual('/en_US/product/product1', match.location.pathname, 'should return a matching route dynamically');
         resolve()
     })
 }));

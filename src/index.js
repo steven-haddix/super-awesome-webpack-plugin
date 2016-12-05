@@ -7,6 +7,14 @@ import { renderToString } from 'react-dom/server'
 import { createStore } from 'redux';
 import lodash from 'lodash';
 
+import {
+    getComponent,
+    match,
+    browserHistory,
+    RouterContext,
+    createMemoryHistory
+} from 'react-router'
+
 import { rootRoute, matchRoute } from './routingUtils'
 import { walkSync } from './fileUtils'
 import { findAssetName, getAssetsFromCompilation, generateConfiguration, compileConfiguration } from './webpackUtils';
@@ -57,12 +65,11 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                             const state = require(path.resolve(dataFile));
                             const appRoute = generateAppRoute(dataFile, dataDir);
 
-                            matchRoute(indexRoute, routes, (route) => {
-                                if(!route) {
-                                    return;
-                                }
-                                const component = route.component;
-                                const renderedPage = renderPage(component, reducer, state);
+                            matchRoute(indexRoute, routes, (component, error) => {
+                                if(!component)
+                                    throw new Error(error);
+
+                                const renderedPage = renderPage(RouterContext, component, reducer, state);
                                 const app = `${appRoute}/${asset}`;
                                 const renderedIndex = template({
                                     html: renderedPage,
@@ -78,17 +85,14 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
 
                                 compilation.assets[path.join(indexRoute, 'index.html')] = new RawSource(renderedIndex);
                             });
-                        })
+                        });
                         cleanUpAsset(appRoutes, asset, compilation);
-                    }).catch((err) => {
-                        console.log(err)
-                        throw new Error(err)
-                    })
-                })
+                    });
+                });
 
                 Promise.all(sitePromises)
                     .then(() => done())
-                    .catch((err) => console.log(err))
+                    .catch((err) => compilation.errors.push(err.stack))
             } catch (err) {
                 compilation.errors.push(err.stack);
                 done();
@@ -111,11 +115,15 @@ SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
                 site.component = es6Accessor(component);
 
                 resolve()
-            }).catch((err) => console.log(err));
+            });
         }).then(() => {
             const entries = [];
 
+            if(!site.routes) throw new Error(`No routes configured for site "${site.entry}"`);
+
             site.routes.forEach((route) => {
+                if(!route.component || !route.path)
+                    throw new Error('Invalid route configuration. Routes must have both path and component defined');
                 entries.push({ key: uuid.v4(), file: route.component, path: route.path })
             });
 
@@ -132,7 +140,7 @@ SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
                     });
 
                     resolve(site);
-                }).catch((err) => console.log(err))
+                })
             })
         })
 };
@@ -141,10 +149,10 @@ function generateAppRoute(file, base) {
     return trimSplitRight(file.replace(base.replace('./', ''), ''), '/', 1);
 }
 
-function renderPage(component, reducer,  state) {
+function renderPage(component, props, reducer,  state) {
     const store = createStore(reducer, state);
     return renderToString(
-        providerWrapper(component, store)
+        providerWrapper(component, props, store)
     );
 }
 

@@ -1,7 +1,10 @@
+import React from 'react'
+import { renderToString } from 'react-dom/server'
 import {
     getComponent,
     match,
     browserHistory,
+    RouterContext,
     createMemoryHistory
 } from 'react-router'
 
@@ -21,7 +24,7 @@ export function children(routes) {
 export function createRoute(path, component, childRoutes) {
 
     if (typeof path !== 'string' || (childRoutes && !Array.isArray(childRoutes))) {
-        throw new Error('Route found with invalid path type. Should be string.')
+        throw new Error(`Route found with an invalid path type. Should be string.`)
     }
 
     const route = {
@@ -42,11 +45,10 @@ export function matchRoute(route, routes, callback) {
         const location = history.createLocation(route);
 
         match({routes, location}, (error, redirectLocation, renderProps) => {
-
             if (error) {
                 callback(null, error);
             } else if (renderProps) {
-                callback(renderProps.routes[renderProps.routes.length -1]);
+                callback(renderProps);
             } else {
                 callback(null);
             }

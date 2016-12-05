@@ -4,6 +4,8 @@ import React from 'react'
 import { Provider } from 'react-redux'
 import { combineReducers } from 'redux';
 
+import { RouterContext } from 'react-router'
+
 export function copyObjectProperty(object, oldKey, newKey) {
     // Do nothing if the names are the same
     if (oldKey == newKey) {
@@ -22,9 +24,9 @@ export function copyObjectProperty(object, oldKey, newKey) {
     return this;
 }
 
-export function providerWrapper(Component, store) {
+export function providerWrapper(Component, props, store) {
     return <Provider store = {store}>
-        <Component />
+        <Component {...props} />
     </Provider>
 }
 
