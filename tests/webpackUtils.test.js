@@ -79,7 +79,7 @@ test('findAssetName', (t) => {
     t.end()
 })
 
-test.only('compileConfiguration', (t) => new Promise((resolve, reject) => {
+test('compileConfiguration', (t) => new Promise((resolve, reject) => {
     const simpleEntry = uuid.v4();
     const complexEntry = uuid.v4();
     const ce = uuid.v4();
