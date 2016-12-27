@@ -59,7 +59,7 @@ const baseConfiguration = {
     },
     module: {
         loaders: [
-            { test: /\.js$/, loader: 'babel', include: path.join(process.cwd(), './tests'), query: { compact: true }},
+            { test: /\.js$/, loader: 'babel', exclude: /(node_modules|\.super_awesome)/, query: { compact: true }},
         ]
     },
     plugins: [
