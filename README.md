@@ -70,6 +70,12 @@ const staticConfig = {
         entry: 'main',
         template,
         component: './src/js/components/pages/Wrapper', // wrapper component that wraps each route component
+        /**
+         * This is a bit of a hack, but until a better solution can be found this will work.
+         * The plugin will look for a data file named 'index.json' at the base of dataDir and relate
+         * it to this indexRoute.
+        /*
+        indexRoute: { component: './src/js/components/pages/Home' }
         pages: [
             /**
              * Pages dictate what index.html's get created. Each page must have a matching
@@ -104,6 +110,7 @@ const staticConfig = {
 ### Example Data Directory
 ```javascript
 /data
+    index.json // This is a copy of /en_US/home.json
     /en_US
         home.json // /en_US/home/index.html
         explore.json // /en_US/explore/index.html

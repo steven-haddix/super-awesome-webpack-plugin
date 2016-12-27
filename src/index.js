@@ -17,7 +17,14 @@ import {
 
 import { rootRoute, matchRoute } from './routingUtils'
 import { walkSync } from './fileUtils'
-import { findAssetName, getAssetsFromCompilation, generateConfiguration, compileConfiguration } from './webpackUtils';
+import {
+    findAssetName,
+    getAssetsFromCompilation,
+    generateConfiguration,
+    compileConfiguration,
+    prepareSiteConfigurations
+} from './webpackUtils';
+
 import {
     copyObjectProperty,
     providerWrapper,
@@ -58,17 +65,21 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                     const template = es6Accessor(site.template);
 
                     return self.resolveConfigComponents(lodash.cloneDeep(site)).then((siteFixed) => {
-                        const routes = rootRoute(siteFixed.component, siteFixed.routes)
+                        const routes = rootRoute(siteFixed.component, siteFixed.routes, siteFixed.index)
 
                         dataFiles.map((dataFile) => {
-                            const indexRoute = dataFile.replace(dataDir.replace('./', ''), '').replace('.json', '');
+                            let fileRoute = dataFile.replace(dataDir.replace('./', ''), '').replace('.json', '');
                             const state = require(path.resolve(dataFile));
-                            const appRoute = generateAppRoute(dataFile, dataDir);
+                            let appRoute = generateAppRoute(dataFile, dataDir);
 
-                            matchRoute(indexRoute, routes, (component, error) => {
+                            // TODO: find a better solution for handling index routes
+                            if (fileRoute === '/index') {
+                                fileRoute = '/'
+                            }
+
+                            matchRoute(fileRoute, routes, (component, error) => {
                                 if(!component)
-                                    throw new Error(error);
-
+                                    throw new Error(`Error matching route ${fileRoute}`, error);
                                 const renderedPage = renderPage(RouterContext, component, reducer, state);
                                 const app = `${appRoute}/${asset}`;
                                 const renderedIndex = template({
@@ -83,7 +94,7 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                                 copyObjectProperty(compilation.assets, `${asset}.map`, `${app}.map`);
                                 appRoutes.push(app);
 
-                                compilation.assets[path.join(indexRoute, 'index.html')] = new RawSource(renderedIndex);
+                                compilation.assets[path.join(fileRoute, 'index.html')] = new RawSource(renderedIndex);
                             });
                         });
                         cleanUpAsset(appRoutes, asset, compilation);
@@ -102,47 +113,29 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
 };
 
 SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
-    const uuid = require('uuid');
-    const rootUUID = uuid.v4();
+    const preparedConfigurations = prepareSiteConfigurations(site, this.staticWebpackConfig);
 
-    const rootEntry = generateConfiguration([{ key: rootUUID, file: site.component, path: '/'}], this.staticWebpackConfig)
+    return compileConfiguration(preparedConfigurations.configurations).then(() => {
+        const component = require(path.join(process.cwd(), `.super_awesome/build/${preparedConfigurations.keys.root}.js`))
+        site.component = es6Accessor(component);
 
-    return compileConfiguration(rootEntry)
-        .then(() => {
-            return new Promise((resolve) => {
+        if(preparedConfigurations.keys.index) {
+            const component = require(path.join(process.cwd(), `.super_awesome/build/${preparedConfigurations.keys.index}.js`))
+            site.index = es6Accessor(component);
+        }
 
-                const component = require(path.join(process.cwd(), `.super_awesome/build/${rootUUID}.js`))
-                site.component = es6Accessor(component);
+        site.routes.forEach((route) => {
+            if(!preparedConfigurations.keys.children[route.path]) {
+                throw new Error('Route found with no matching statically generated bundle.', route)
+            }
 
-                resolve()
-            });
-        }).then(() => {
-            const entries = [];
+            const key = preparedConfigurations.keys.children[route.path]
+            const component = require(path.join(process.cwd(), `.super_awesome/build/${key}.js`))
+            route.component = es6Accessor(component)
+        });
 
-            if(!site.routes) throw new Error(`No routes configured for site "${site.entry}"`);
-
-            site.routes.forEach((route) => {
-                if(!route.component || !route.path)
-                    throw new Error('Invalid route configuration. Routes must have both path and component defined');
-                entries.push({ key: uuid.v4(), file: route.component, path: route.path })
-            });
-
-            const entriesConfig = generateConfiguration(entries, this.staticWebpackConfig);
-            return compileConfiguration(entriesConfig).then(() => {
-                return new Promise((resolve) => {
-                    entries.forEach((entry) => {
-                        site.routes.forEach((route) => {
-                            if(route.path === entry.path) {
-                                const component = require(path.join(process.cwd(), `.super_awesome/build/${entry.key}.js`))
-                                route.component = es6Accessor(component)
-                            }
-                        })
-                    });
-
-                    resolve(site);
-                })
-            })
-        })
+        return Promise.resolve(site);
+    })
 };
 
 function generateAppRoute(file, base) {

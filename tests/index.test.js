@@ -118,6 +118,16 @@ test('should handle configuration files properly', (t) => {
                                         },
                                         style: 'style.css',
                                         vendor: 'vendor.js'
+                                    },
+                                    '/index.html': {
+                                        app: '/main.js',
+                                        html: '',
+                                        manifest: 'manifest.js',
+                                        state: {
+                                            content: {}
+                                        },
+                                        style: 'style.css',
+                                        vendor: 'vendor.js'
                                     }
                                 });
 
@@ -143,6 +153,7 @@ test('should handle configuration files properly', (t) => {
 blueTape('resolveConfigComponents', (t) => new Promise((resolve) => {
     const siteConfig = {
         component: './tests/stubs/Component.stub.js',
+        index: {  component: './tests/stubs/Component.stub.js' },
         routes: [
             { path: '/*/fake1', component: './tests/stubs/Component.stub.js' },
             { path: '/*/fake2', component: './tests/stubs/Component.stub.js' },

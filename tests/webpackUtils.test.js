@@ -8,7 +8,8 @@ import {
     findAssetName,
     getAssetsFromCompilation,
     generateConfiguration,
-    compileConfiguration
+    compileConfiguration,
+    prepareSiteConfigurations
 } from '../src/webpackUtils';
 
 test('getAssetsFromCompilation', (t) => {
@@ -137,5 +138,24 @@ test('generateConfiguration', (t) => {
 
     t.deepEqual(generatedConfig.entry, { key1: 'file1', key2: 'file2' }, 'should add entries to configuration');
     t.equal(generatedConfig.module.loaders[1].loader, 'someLoader', 'should merge additional configurations with base configuration');
+    t.end()
+})
+
+test('prepareSiteConfigurations', (t) => {
+    const siteConfig = {
+        component: './tests/stubs/Component.stub.js',
+        index: {  component: './tests/stubs/Component.stub.js' },
+        routes: [
+            { path: '/*/fake1', component: './tests/stubs/Component.stub.js' },
+            { path: '/*/fake2', component: './tests/stubs/Component.stub.js' },
+            { path: '/fake', component: './tests/stubs/Component.stub.js' }
+        ]
+    };
+
+    const siteConfigurations = prepareSiteConfigurations(siteConfig);
+
+    t.notEqual(siteConfigurations.keys.root.length, 0,'should generate root key');
+    t.notEqual(siteConfigurations.keys.index.length, 0,'should generate index key when provided index');
+    t.notEqual(siteConfigurations.keys.children['/*/fake1'].length, 0, 'should generate child object using paths as keys');
     t.end()
 })

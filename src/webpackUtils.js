@@ -59,7 +59,7 @@ const baseConfiguration = {
     },
     module: {
         loaders: [
-            { test: /\.js$/, loader: 'babel?compact=false', exclude: /(node_modules|\.super_awesome)/, query: { compact: false } },
+            { test: /\.js$/, loader: 'babel', exclude: /(node_modules|\.super_awesome)/, query: { compact: true }},
         ]
     },
     plugins: [
@@ -68,6 +68,42 @@ const baseConfiguration = {
         })
     ]
 };
+
+export function prepareSiteConfigurations(site, webpack) {
+    const uuid = require('uuid');
+    const rootKey = uuid.v4();
+
+    const keys = {
+        root: rootKey,
+        index: null,
+        children: {}
+    };
+
+    const configurations = [{ key: rootKey, file: site.component, path: '/'}];
+
+    if(!site.routes) throw new Error(`No routes configured for site "${site.entry}"`);
+
+    site.routes.forEach((route) => {
+        if(!route.component || !route.path) throw new Error('Invalid route configuration. Routes must have both path and component defined');
+        if(keys.children[route.path]) throw new Error(`Duplicate paths found for ${route.path}`);
+
+        const childKey = uuid.v4();
+        keys.children[route.path] = childKey;
+        configurations.push({ key: childKey, file: route.component, path: route.path })
+    });
+
+    if (site.index) {
+        const indexKey = uuid.v4();
+        keys.index = indexKey;
+        configurations.push({ key: indexKey, file: site.index.component, path: '/' })
+    }
+
+    return {
+        keys,
+        configurations: generateConfiguration(configurations, webpack)
+    };
+}
+
 
 export function generateConfiguration(entries = [], configuration = {}) {
     if (typeof configuration !== 'object') {

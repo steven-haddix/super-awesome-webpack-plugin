@@ -5,13 +5,19 @@ import { matchRoute, createRoute, rootRoute } from '../src/routingUtils';
 tape('rootRoute', (t) => {
     t.deepEqual(
         rootRoute({}, [{ path: '/path', component: {}}]),
-        { childRoutes: [ { component: {}, path: '/', childRoutes: [{ path: '/path', component: {}}] }] },
+        { component: {}, path: '/', childRoutes: [{ path: '/path', component: {}}] },
         'should generate a route with a child array'
     )
 
     t.deepEqual(
+        rootRoute({}, [{ path: '/path', component: {}}], {}),
+        { component: {}, path: '/', indexRoute: { component: {}}, childRoutes: [{ path: '/path', component: {}}] },
+        'should generate a route with an index route'
+    )
+
+    t.deepEqual(
         rootRoute({}),
-        { childRoutes: [ { component: {}, path: '/' }] },
+        { component: {}, path: '/' },
         'should generate a route without a child array if none are provided'
     )
     t.end();
@@ -40,6 +46,16 @@ blueTape('matchRoute', (t) => new Promise(resolve => {
 
     const match = matchRoute('/en_US/product/product1', routes, (match) => {
         t.deepEqual('/en_US/product/product1', match.location.pathname, 'should return a matching route dynamically');
+        resolve()
+    })
+
+    const indexRoutes = {
+        path: '/',
+        indexRoute: { component: Component }
+    };
+
+    matchRoute('/', indexRoutes, (match) => {
+        t.deepEqual(match.location.pathname, '/', 'should return a matching route dynamically');
         resolve()
     })
 }));

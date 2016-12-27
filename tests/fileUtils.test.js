@@ -1,5 +1,5 @@
 import blueTape from 'blue-tape';
-import tape from 'blue-tape';
+import tape from 'tape';
 import { walkAsync, walkSync } from '../src/fileUtils';
 
 blueTape('walkAsync', (t) => new Promise((done) => {
@@ -7,7 +7,7 @@ blueTape('walkAsync', (t) => new Promise((done) => {
 
     const test1 = new Promise((resolve) => {
         walkAsync('./tests/fakeDirectory', (result) => {
-            t.equal(result.length, 5, 'should return 5 files')
+            t.equal(result.length, 6, 'should return 5 files')
             resolve()
         })
     })
@@ -21,7 +21,7 @@ blueTape('walkAsync', (t) => new Promise((done) => {
 
     const test3 = new Promise((resolve) => {
         walkAsync('./tests/fakeDirectory', (result) => {
-            t.equal(result.length, 3, 'should filter results and return 3 json file')
+            t.equal(result.length, 4, 'should filter results and return 3 json file')
             resolve()
         }, -1, /.*\.json/)
     })
@@ -57,8 +57,8 @@ blueTape('walkAsync', (t) => new Promise((done) => {
 tape('walkSync', (t) => {
     t.plan(2);
 
-    t.equal(walkSync('./tests/fakeDirectory').length, 5, 'should return all 5 files in directory');
-    t.equal(walkSync('./tests/fakeDirectory', [], /.*\.json/).length, 3, 'should return only .json files when filter is applied')
+    t.equal(walkSync('./tests/fakeDirectory').length, 6, 'should return all 5 files in directory');
+    t.equal(walkSync('./tests/fakeDirectory', [], /.*\.json/).length, 4, 'should return only .json files when filter is applied')
     t.end()
 })
 
