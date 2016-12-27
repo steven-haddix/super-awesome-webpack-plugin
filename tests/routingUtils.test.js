@@ -55,7 +55,6 @@ blueTape('matchRoute', (t) => new Promise(resolve => {
     };
 
     matchRoute('/', indexRoutes, (match) => {
-        console.log(match)
         t.deepEqual(match.location.pathname, '/', 'should return a matching route dynamically');
         resolve()
     })
