@@ -8,10 +8,16 @@ import {
     createMemoryHistory
 } from 'react-router'
 
-export function rootRoute(component, childRoutes) {
-    return {
-        childRoutes: [createRoute('/', component, children(childRoutes))]
+export function rootRoute(component, childRoutes, indexComponent) {
+    if (indexComponent) {
+        return createRoute('/', component, children(childRoutes), indexRoute(indexComponent));
     }
+
+    return createRoute('/', component, children(childRoutes), );
+}
+
+export function indexRoute(component) {
+    return { component };
 }
 
 export function children(routes) {
@@ -21,7 +27,7 @@ export function children(routes) {
     return routes.map(route => createRoute(route.path, route.component))
 }
 
-export function createRoute(path, component, childRoutes) {
+export function createRoute(path, component, childRoutes, indexRoute) {
 
     if (typeof path !== 'string' || (childRoutes && !Array.isArray(childRoutes))) {
         throw new Error(`Route found with an invalid path type. Should be string.`)
@@ -31,6 +37,10 @@ export function createRoute(path, component, childRoutes) {
         path,
         component
     };
+
+    if(indexRoute) {
+        route.indexRoute = indexRoute;
+    }
 
     if(childRoutes) {
         route.childRoutes = childRoutes;
