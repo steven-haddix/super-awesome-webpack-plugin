@@ -65,7 +65,7 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                     const template = es6Accessor(site.template);
 
                     return self.resolveConfigComponents(lodash.cloneDeep(site)).then((siteFixed) => {
-                        const routes = rootRoute(siteFixed.component, siteFixed.routes)
+                        const routes = rootRoute(siteFixed.component, siteFixed.routes, siteFixed.index)
 
                         dataFiles.map((dataFile) => {
                             let fileRoute = dataFile.replace(dataDir.replace('./', ''), '').replace('.json', '');
@@ -113,7 +113,7 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
 };
 
 SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
-    const preparedConfigurations = prepareSiteConfigurations(site);
+    const preparedConfigurations = prepareSiteConfigurations(site, this.staticWebpackConfig);
 
     return compileConfiguration(preparedConfigurations.configurations).then(() => {
         const component = require(path.join(process.cwd(), `.super_awesome/build/${preparedConfigurations.keys.root}.js`))

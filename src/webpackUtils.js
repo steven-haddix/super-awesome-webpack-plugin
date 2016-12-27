@@ -69,7 +69,7 @@ const baseConfiguration = {
     ]
 };
 
-export function prepareSiteConfigurations(site) {
+export function prepareSiteConfigurations(site, webpack) {
     const uuid = require('uuid');
     const rootKey = uuid.v4();
 
@@ -100,7 +100,7 @@ export function prepareSiteConfigurations(site) {
 
     return {
         keys,
-        configurations: generateConfiguration(configurations)
+        configurations: generateConfiguration(configurations, webpack)
     };
 }
 
