@@ -1,7 +1,7 @@
 {
   "name": "super-awesome-webpack-plugin",
   "title": "Super Awesome Webpack Plugin",
-  "version": "2.0.14",
+  "version": "2.0.15",
   "description": "A slightly opinionated Webpack plugin for generating static websites using React, React Router, and Redux.",
   "main": "lib/index.js",
   "files": [
