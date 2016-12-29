@@ -103,7 +103,10 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
 
                 Promise.all(sitePromises)
                     .then(() => done())
-                    .catch((err) => compilation.errors.push(err.stack))
+                    .catch((err) =>{
+                        compilation.errors.push(err.stack)
+                        done();
+                    })
             } catch (err) {
                 compilation.errors.push(err.stack);
                 done();
