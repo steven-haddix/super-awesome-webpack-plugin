@@ -117,7 +117,7 @@ export function generateConfiguration(entries = [], configuration = {}) {
     }
 
     entries.forEach((entry) => {
-        config.entry[entry.key] = entry.file;
+        config.entry[entry.key] = [entry.file];
     })
 
     return config;
