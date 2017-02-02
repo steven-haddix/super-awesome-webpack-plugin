@@ -6,7 +6,11 @@
 A slightly opinionated Webpack plugin for generating static websites using React, React Router & Redux.
 
 ## Requirements
-Currently only tested on node v6.3.1
+- Currently only tested on node v6.3.1 & 7
+- < 3.0.0
+    - Webpack 1
+- > 3.0.0
+    - Webpack 2
 
 ## Install
 ```bash

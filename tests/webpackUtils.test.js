@@ -128,7 +128,7 @@ test('generateConfiguration', (t) => {
 
     const configuration = {
         module: {
-            loaders: [
+            rules: [
                 { test: /\.js$/, loader: 'someLoader' }
             ]
         }
@@ -137,7 +137,7 @@ test('generateConfiguration', (t) => {
     const generatedConfig = generateConfiguration(entries, configuration);
 
     t.deepEqual(generatedConfig.entry, { key1: ['file1'], key2: ['file2'] }, 'should add entries to configuration');
-    t.equal(generatedConfig.module.loaders[1].loader, 'someLoader', 'should merge additional configurations with base configuration');
+    t.equal(generatedConfig.module.rules[1].loader, 'someLoader', 'should merge additional configurations with base configuration');
     t.end()
 })
 

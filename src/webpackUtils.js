@@ -54,12 +54,17 @@ const baseConfiguration = {
         libraryTarget: 'commonjs2'
     },
     resolve: {
-        extensions: ['', '.js'],
-        modulesDirectories: ['src', 'node_modules']
+        extensions: ['.js'],
+        modules: ['src', 'node_modules']
     },
     module: {
-        loaders: [
-            { test: /\.js$/, loader: 'babel', exclude: /(node_modules|\.super_awesome)/, query: { compact: true }},
+        rules: [
+            {
+                test: /\.js$/,
+                loader: 'babel-loader',
+                exclude: /(node_modules|\.super_awesome)/,
+                query: { compact: true }
+            },
         ]
     },
     plugins: [
