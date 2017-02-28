@@ -68,7 +68,7 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                         const routes = rootRoute(siteFixed.component, siteFixed.routes, siteFixed.index)
 
                         dataFiles.map((dataFile) => {
-                            let fileRoute = dataFile.replace(dataDir.replace('./', ''), '').replace('.json', '');
+                            let fileRoute = dataFile.replace(dataDir.replace(/^(\.\/|\/)/, ''), '').replace('.json', '');
                             const state = require(path.resolve(dataFile));
                             let appRoute = generateAppRoute(dataFile, dataDir);
 
