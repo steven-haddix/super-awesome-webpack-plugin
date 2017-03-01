@@ -42,6 +42,7 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
     const self = this;
 
     compiler.plugin('this-compilation', function(compilation) {
+        self.compilation = compilation
         compilation.plugin('optimize-assets', function(_, done) {
             try {
                 const webpackStats = compilation.getStats();
@@ -65,62 +66,77 @@ SuperAwesomeWebpackPlugin.prototype.apply = function(compiler) {
                     const template = es6Accessor(site.template);
 
                     return self.resolveConfigComponents(lodash.cloneDeep(site)).then((siteFixed) => {
-                        const routes = rootRoute(siteFixed.component, siteFixed.routes, siteFixed.index)
+                        try {
+                            const routes = rootRoute(siteFixed.component, siteFixed.routes, siteFixed.index)
 
-                        dataFiles.map((dataFile) => {
-                            let fileRoute = dataFile.replace(dataDir.replace('./', ''), '')
-                                                    .replace('.json', '')
-                                                    .replace(/^(\.\/|\/)/, '');
-                            const state = require(path.resolve(dataFile));
-                            let appRoute = generateAppRoute(dataFile, dataDir);
+                            dataFiles.map((dataFile) => {
+                                let fileRoute = dataFile.replace(dataDir.replace('./', ''), '').replace('.json', '');
+                                const state = require(path.resolve(dataFile));
 
-                            // TODO: find a better solution for handling index routes
-                            if (fileRoute === '/index') {
-                                fileRoute = '/'
-                            }
+                                // TODO: find a better solution for handling index routes
+                                if (fileRoute === '/index') {
+                                    fileRoute = '/'
+                                }
 
-                            matchRoute(fileRoute, routes, (component, error) => {
-                                if(!component)
-                                    throw new Error(`Error matching route ${fileRoute}`, error);
-                                const renderedPage = renderPage(RouterContext, component, reducer, state);
-                                const app = `${appRoute}/${asset}`;
-                                const renderedIndex = template({
-                                    html: renderedPage,
-                                    state: state,
-                                    app: app,
-                                    webpack: assets
+                                matchRoute(fileRoute, routes, (component, error) => {
+                                    try {
+                                        if (!component)
+                                            throw new Error(`Error matching route ${fileRoute}`, error);
+
+                                        let renderedPage  = renderPage(RouterContext, component, reducer, state);
+
+                                        const renderedIndex = template({
+                                            html: renderedPage,
+                                            state: state,
+                                            app: asset,
+                                            webpack: assets
+                                        });
+
+                                        self.addCompilationAsset({
+                                            key: path.join(fileRoute, 'index.html'),
+                                            value: new RawSource(renderedIndex)
+                                        })
+                                    } catch(err) {
+                                        self.handleError(err.stack);
+                                    }
                                 });
-
-                                // TODO: Need to fix so assets are placed at minimum file directory
-                                copyObjectProperty(compilation.assets, asset, app);
-                                copyObjectProperty(compilation.assets, `${asset}.map`, `${app}.map`);
-                                appRoutes.push(app);
-
-                                compilation.assets[path.join(fileRoute, 'index.html')] = new RawSource(renderedIndex);
                             });
-                        });
-                        cleanUpAsset(appRoutes, asset, compilation);
+                        } catch(err) {
+                            self.handleError(err.stack);
+                        }
                     });
                 });
 
                 Promise.all(sitePromises)
                     .then(() => done())
                     .catch((err) =>{
-                        compilation.errors.push(err.stack)
+                        self.handleError(err.stack);
                         done();
                     })
             } catch (err) {
-                compilation.errors.push(err.stack);
+                self.handleError(err.stack);
                 done();
             }
         });
     });
+
+    compiler.plugin('done', function(stats) {
+
+    })
 };
+
+SuperAwesomeWebpackPlugin.prototype.handleError = function(err) {
+    this.compilation.errors.push(err)
+}
 
 SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
     const preparedConfigurations = prepareSiteConfigurations(site, this.staticWebpackConfig);
 
-    return compileConfiguration(preparedConfigurations.configurations).then(() => {
+    return compileConfiguration(preparedConfigurations.configurations).then((err, stat) => {
+        if(err) {
+            Promise.reject(err)
+        }
+
         const component = require(path.join(process.cwd(), `.super_awesome/build/${preparedConfigurations.keys.root}.js`))
         site.component = es6Accessor(component);
 
@@ -142,6 +158,15 @@ SuperAwesomeWebpackPlugin.prototype.resolveConfigComponents = function (site) {
         return Promise.resolve(site);
     })
 };
+
+SuperAwesomeWebpackPlugin.prototype.addCompilationAsset = function (asset) {
+    cleanAsset(asset)
+    this.compilation.assets[asset.key] = asset.value;
+}
+
+function cleanAsset(asset) {
+    asset.key = asset.key.replace(/^\/|\.\//g, '')
+}
 
 function generateAppRoute(file, base) {
     return trimSplitRight(file.replace(base.replace('./', ''), ''), '/', 1);

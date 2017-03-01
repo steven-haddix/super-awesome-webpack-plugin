@@ -89,7 +89,7 @@ test('should handle configuration files properly', (t) => {
                         if(event === 'optimize-assets') {
                             callback({}, () => {
                                 t.deepEqual(assets,  {
-                                    '/fake/index.html': {
+                                    'fake/index.html': {
                                         app: '/main.js',
                                         html: '',
                                         manifest: 'manifest.js',
@@ -99,8 +99,8 @@ test('should handle configuration files properly', (t) => {
                                         style: 'style.css',
                                         vendor: 'vendor.js'
                                     },
-                                    '/fakeSubDirectory/fake1/index.html': {
-                                        app: '/fakeSubDirectory/main.js',
+                                    'fakeSubDirectory/fake1/index.html': {
+                                        app: '/main.js',
                                         html: '',
                                         manifest: 'manifest.js',
                                         state: {
@@ -109,8 +109,8 @@ test('should handle configuration files properly', (t) => {
                                         style: 'style.css',
                                         vendor: 'vendor.js'
                                     },
-                                    '/fakeSubDirectory/fake2/index.html': {
-                                        app: '/fakeSubDirectory/main.js',
+                                    'fakeSubDirectory/fake2/index.html': {
+                                        app: '/main.js',
                                         html: '',
                                         manifest: 'manifest.js',
                                         state: {
@@ -119,7 +119,7 @@ test('should handle configuration files properly', (t) => {
                                         style: 'style.css',
                                         vendor: 'vendor.js'
                                     },
-                                    '/index.html': {
+                                    'index.html': {
                                         app: '/main.js',
                                         html: '',
                                         manifest: 'manifest.js',
